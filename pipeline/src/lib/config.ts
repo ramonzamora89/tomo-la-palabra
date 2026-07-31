@@ -24,6 +24,20 @@ export const config = {
   get googleServiceAccountJson() {
     return required("GOOGLE_SERVICE_ACCOUNT_JSON");
   },
+  // Service accounts have no Drive storage quota of their own — a personal
+  // (non-Workspace) Gmail account can't use Shared Drives or domain-wide
+  // delegation to work around that. These OAuth creds (a one-time consent
+  // from the real account) are used ONLY for creating new Drive files;
+  // everything else (read, edit, move) still goes through the SA.
+  get googleOAuthClientId() {
+    return required("GOOGLE_OAUTH_CLIENT_ID");
+  },
+  get googleOAuthClientSecret() {
+    return required("GOOGLE_OAUTH_CLIENT_SECRET");
+  },
+  get googleOAuthRefreshToken() {
+    return required("GOOGLE_OAUTH_REFRESH_TOKEN");
+  },
   driveFolders: {
     get entrevistas() {
       return required("DRIVE_FOLDER_ENTREVISTAS_ID");

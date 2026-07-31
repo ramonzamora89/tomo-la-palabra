@@ -40,6 +40,7 @@ async function downloadDriveFile(
 async function processVideo(
   drive: drive_v3.Drive,
   docs: ReturnType<typeof getGoogleClients>["docs"],
+  driveAsUser: ReturnType<typeof getGoogleClients>["driveAsUser"],
   video: drive_v3.Schema$File,
   tmpDir: string,
 ): Promise<void> {
@@ -73,20 +74,23 @@ async function processVideo(
   const draft = await draftArticle(transcript);
 
   console.log("Creando Google Doc...");
-  const createRes = await docs.documents.create({
-    requestBody: { title: draft.titular },
+  // Service accounts have no Drive storage quota of their own (personal
+  // Gmail has no Shared Drives / domain-wide delegation to work around
+  // that) — create as the real OAuth user instead. The SA already has
+  // Editor on Borradores, so it inherits edit access to the new file too.
+  const createRes = await driveAsUser.files.create({
+    requestBody: {
+      name: draft.titular,
+      mimeType: "application/vnd.google-apps.document",
+      parents: [config.driveFolders.borradores],
+    },
+    fields: "id",
   });
-  const documentId = createRes.data.documentId!;
+  const documentId = createRes.data.id!;
 
   await docs.documents.batchUpdate({
     documentId,
     requestBody: { requests: buildDraftDocRequests(draft, "", transcript) },
-  });
-
-  await drive.files.update({
-    fileId: documentId,
-    addParents: config.driveFolders.borradores,
-    fields: "id, parents",
   });
 
   await drive.files.update({
@@ -98,7 +102,7 @@ async function processVideo(
 }
 
 async function main() {
-  const { drive, docs } = getGoogleClients();
+  const { drive, docs, driveAsUser } = getGoogleClients();
 
   const list = await drive.files.list({
     q: `'${config.driveFolders.entrevistas}' in parents and trashed = false`,
@@ -118,7 +122,7 @@ async function main() {
   fs.mkdirSync(tmpDir, { recursive: true });
 
   for (const video of videos) {
-    await processVideo(drive, docs, video, tmpDir);
+    await processVideo(drive, docs, driveAsUser, video, tmpDir);
   }
 }
 

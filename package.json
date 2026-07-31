@@ -9,7 +9,8 @@
     "lint": "next lint",
     "pipeline:transcribe-local": "tsx pipeline/src/transcribeLocal.ts",
     "pipeline:draft-local": "tsx pipeline/src/draftLocal.ts",
-    "pipeline:watch-entrevistas": "tsx pipeline/src/watchEntrevistas.ts"
+    "pipeline:watch-entrevistas": "tsx pipeline/src/watchEntrevistas.ts",
+    "pipeline:google-oauth-setup": "tsx pipeline/src/oauthSetup.ts"
   },
   "dependencies": {
     "next": "^15.1.0",
