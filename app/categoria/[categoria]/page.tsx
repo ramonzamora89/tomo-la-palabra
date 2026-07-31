@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCategoria, categorias } from "@/content/taxonomy/categorias";
 import { getNotasByCategoria } from "@/lib/notas";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -6,6 +7,16 @@ import { GrungeDivider } from "@/components/GrungeDivider";
 
 export function generateStaticParams() {
   return categorias.map((c) => ({ categoria: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ categoria: string }>;
+}): Promise<Metadata> {
+  const { categoria: categoriaSlug } = await params;
+  const categoria = getCategoria(categoriaSlug);
+  return { title: categoria?.nombre ?? categoriaSlug };
 }
 
 export default async function CategoriaPage({

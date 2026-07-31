@@ -28,6 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-GT" className={`${bodyFont.variable} ${displayFont.variable} ${handFont.variable}`}>
       <body className="font-sans">
+        <a href="#main-content" className="sr-only-focusable bg-brand-verde px-4 py-2 text-white">
+          Saltar al contenido principal
+        </a>
         <JsonLd data={organizationJsonLd()} />
         {adsenseClientId && (
           <Script
@@ -38,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
         <SiteHeader />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <SiteFooter />
       </body>
     </html>

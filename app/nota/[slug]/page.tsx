@@ -79,7 +79,7 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
         {nota.title}
       </h1>
       <p className="mt-3 text-lg text-ink-600">{nota.dek}</p>
-      <p className="mt-4 text-sm uppercase tracking-wide text-ink-500">
+      <p className="mt-4 text-sm uppercase tracking-wide text-ink-600">
         Por {nota.author} &middot; <time dateTime={nota.pubDate}>{formatDate(nota.pubDate)}</time>
         {categoria ? <> &middot; {categoria.nombre}</> : null}
       </p>

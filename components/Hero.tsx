@@ -7,10 +7,15 @@ export function Hero({ nota }: { nota: Nota }) {
   return (
     <section className="relative overflow-hidden bg-brand-verde bg-[url('/images/paper-texture.svg')] bg-cover">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-2 md:py-16">
-        <Link href={`/nota/${nota.slug}`} className="relative block aspect-video overflow-hidden">
+        <Link
+          href={`/nota/${nota.slug}`}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="relative block aspect-video overflow-hidden"
+        >
           <Image
             src={nota.coverImage}
-            alt={nota.coverImageAlt}
+            alt=""
             fill
             priority
             className="object-cover"

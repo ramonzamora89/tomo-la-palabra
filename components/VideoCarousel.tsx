@@ -21,7 +21,7 @@ export function VideoCarousel({ videos }: { videos: YoutubeVideo[] }) {
           <div className="relative aspect-video overflow-hidden bg-ink-200">
             <Image
               src={video.thumbnailUrl}
-              alt={video.title}
+              alt=""
               fill
               className="object-cover grayscale transition group-hover:grayscale-0"
               sizes="288px"
@@ -30,7 +30,7 @@ export function VideoCarousel({ videos }: { videos: YoutubeVideo[] }) {
           <h3 className="mt-2 line-clamp-2 font-display text-base leading-tight text-brand-verde">
             {video.title}
           </h3>
-          <p className="text-xs uppercase tracking-wide text-ink-500">
+          <p className="text-xs uppercase tracking-wide text-ink-600">
             {formatDate(video.publishedAt)}
           </p>
         </a>

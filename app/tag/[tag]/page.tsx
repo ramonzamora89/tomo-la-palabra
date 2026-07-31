@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { getAllTags, getNotasByTag } from "@/lib/notas";
 import { ArticleCard } from "@/components/ArticleCard";
 import { GrungeDivider } from "@/components/GrungeDivider";
 
 export function generateStaticParams() {
   return getAllTags().map((tag) => ({ tag }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tag: string }>;
+}): Promise<Metadata> {
+  const { tag } = await params;
+  return { title: `#${tag}` };
 }
 
 export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {

@@ -19,7 +19,7 @@ export function AdSlot({ id, type }: { id: string; type: AdSlotType }) {
   return (
     <div
       data-ad-slot-id={id}
-      className={`mx-auto flex items-center justify-center border border-dashed border-ink-300 bg-ink-50 text-xs text-ink-500 ${SIZES[type]}`}
+      className={`mx-auto flex items-center justify-center border border-dashed border-ink-300 bg-ink-50 text-xs text-ink-600 ${SIZES[type]}`}
     >
       {provider === "adsense" ? (
         <ins

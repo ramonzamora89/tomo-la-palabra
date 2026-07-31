@@ -16,10 +16,15 @@ export function ArticleCard({ nota, size = "md" }: { nota: Nota; size?: "md" | "
 
   return (
     <article className="group flex flex-col gap-3">
-      <Link href={`/nota/${nota.slug}`} className="relative block aspect-video overflow-hidden bg-ink-200">
+      <Link
+        href={`/nota/${nota.slug}`}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="relative block aspect-video overflow-hidden bg-ink-200"
+      >
         <Image
           src={nota.coverImage}
-          alt={nota.coverImageAlt}
+          alt=""
           fill
           className="object-cover grayscale transition group-hover:grayscale-0"
           sizes="(min-width: 768px) 50vw, 100vw"
@@ -33,7 +38,7 @@ export function ArticleCard({ nota, size = "md" }: { nota: Nota; size?: "md" | "
           </h3>
         </Link>
         <p className="line-clamp-2 text-sm text-ink-600">{nota.dek}</p>
-        <p className="text-xs uppercase tracking-wide text-ink-500">
+        <p className="text-xs uppercase tracking-wide text-ink-600">
           {nota.author} &middot; {formatDate(nota.pubDate)}
         </p>
       </div>

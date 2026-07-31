@@ -15,6 +15,8 @@ export default function HomePage() {
       {featured && <Hero nota={featured} />}
 
       <section className="mx-auto max-w-6xl px-4 py-10">
+        <h2 className="font-display text-2xl tracking-tight text-brand-verde">Más notas</h2>
+        <GrungeDivider className="my-3" />
         <div className="grid gap-8 md:grid-cols-3">
           {secondary.map((nota) => (
             <ArticleCard key={nota.slug} nota={nota} />
