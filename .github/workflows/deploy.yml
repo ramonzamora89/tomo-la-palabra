@@ -6,13 +6,22 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # Pushes made with the default GITHUB_TOKEN (e.g. from Publish) don't
+  # trigger `on: push` workflows — GitHub's own loop-prevention rule. Chain
+  # off Publish's completion instead so publishing a note still deploys.
+  workflow_run:
+    workflows: ["Publish"]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
       - uses: actions/setup-node@v4
         with:
