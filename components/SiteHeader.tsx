@@ -4,7 +4,7 @@ import { MobileNav } from "./MobileNav";
 
 export function SiteHeader() {
   return (
-    <header className="relative border-b border-brand-gris bg-white">
+    <header className="sticky top-0 z-50 border-b border-brand-gris bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="font-hand text-3xl leading-none text-brand-verde">
           Tomo la Palabra
