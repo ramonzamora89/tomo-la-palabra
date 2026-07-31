@@ -28,3 +28,14 @@ pipeline/tmp/
 *.tsbuildinfo
 .vercel
 .env*
+
+# Google credential files downloaded straight into the project by mistake —
+# never commit these. The real values live in .env.local / GitHub Secrets.
+client_secret_*.json
+*-33ed9348189c.json
+
+# Business presentation deck — not site source, kept out of this repo
+presentacion-flujo/
+
+# Local Claude Code session state
+.claude/
