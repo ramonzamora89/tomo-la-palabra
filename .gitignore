@@ -5,6 +5,9 @@ node_modules/
 .next/
 out/
 
+# Vercel CLI local link/config (contains org/project IDs, not secret but local-only)
+.vercel/
+
 # Env / secrets
 .env
 .env.local
@@ -22,3 +25,5 @@ TOMO LA PALABRA_BRANDBOOK 2025.pdf
 # Pipeline runtime artifacts
 pipeline/tmp/
 *.log
+.vercel
+.env*
