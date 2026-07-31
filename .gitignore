@@ -25,5 +25,6 @@ TOMO LA PALABRA_BRANDBOOK 2025.pdf
 # Pipeline runtime artifacts
 pipeline/tmp/
 *.log
+*.tsbuildinfo
 .vercel
 .env*
