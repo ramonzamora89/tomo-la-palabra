@@ -1,0 +1,45 @@
+name: Publish
+
+# Watches Publicar: a journalist dragging a reviewed Doc here IS the publish
+# trigger. Parses it, commits the note to the repo (which triggers Deploy),
+# moves the Doc to Archivo, and logs it in the Registro de Publicaciones.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Configure git identity for the publish commit
+        run: |
+          git config user.name "Tomo la Palabra Bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Run watchPublicar
+        env:
+          DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          DRIVE_FOLDER_ENTREVISTAS_ID: ${{ secrets.DRIVE_FOLDER_ENTREVISTAS_ID }}
+          DRIVE_FOLDER_BORRADORES_ID: ${{ secrets.DRIVE_FOLDER_BORRADORES_ID }}
+          DRIVE_FOLDER_PUBLICAR_ID: ${{ secrets.DRIVE_FOLDER_PUBLICAR_ID }}
+          DRIVE_FOLDER_ARCHIVO_ID: ${{ secrets.DRIVE_FOLDER_ARCHIVO_ID }}
+          DRIVE_LEDGER_SHEET_ID: ${{ secrets.DRIVE_LEDGER_SHEET_ID }}
+          NEXT_PUBLIC_SITE_URL: https://tomo-la-palabra.vercel.app
+        run: npm run pipeline:watch-publicar
