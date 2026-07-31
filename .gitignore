@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Env / secrets
+.env
+.env.local
+.env*.local
+
+# Editor / OS
+.DS_Store
+
+# Brand source assets — large binaries, not needed to build/run the site
+VIDEOS/
+USO DE REDES/
+LOGO/*.ai
+TOMO LA PALABRA_BRANDBOOK 2025.pdf
+
+# Pipeline runtime artifacts
+pipeline/tmp/
+*.log
