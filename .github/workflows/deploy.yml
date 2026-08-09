@@ -23,13 +23,41 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
+      # Publish runs on a 15-min cron and completes successfully even when
+      # there's nothing new to publish, which used to trigger a real
+      # `vercel deploy` every time via workflow_run below — burning through
+      # Vercel's free-tier upload quota (5000/day) with same-commit
+      # redeploys. Skip the deploy entirely when this commit is already
+      # live in production.
+      - name: Check if this commit is already deployed
+        id: check
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          LATEST_SHA=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=production&limit=1&state=READY" \
+            | jq -r '.deployments[0].meta.githubCommitSha // empty' || echo "")
+          echo "Commit a desplegar: $SHA"
+          echo "Último deploy en producción: ${LATEST_SHA:-<no se pudo determinar>}"
+          if [ -n "$LATEST_SHA" ] && [ "$SHA" = "$LATEST_SHA" ]; then
+            echo "Ya está desplegado, se omite el build/deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.skip != 'true'
         with:
           node-version: 20
 
       - run: npm ci
+        if: steps.check.outputs.skip != 'true'
 
       - name: Deploy to Vercel (production)
+        if: steps.check.outputs.skip != 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
