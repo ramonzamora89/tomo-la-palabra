@@ -41,6 +41,7 @@ Los 10 milestones del plan original están completos y verificados de punta a pu
 - **Vercel Pro**: el sitio corre en el plan Hobby (gratis). Los términos de Vercel restringen Hobby a uso no comercial — como el sitio va a llevar AdSense, hay que pasar a Pro (~$20/mes) antes de anunciarlo públicamente.
 - **Ledger de correcciones**: cuando se re-publica una nota editada (mover el Doc de Archivo de vuelta a Publicar), el Registro de Publicaciones agrega una fila nueva en vez de marcar la original como "editada". Funciona, pero podría afinarse.
 - **Auditoría de accesibilidad**: la pasada de código ya está hecha; falta una prueba real con un lector de pantalla (VoiceOver/NVDA) antes de considerarlo cerrado del todo.
+- **Incidente resuelto (2026-08-09)**: `Deploy` fallaba en cada corrida (`Too many requests... api-upload-free`) porque redesplegaba el mismo commit ~70-95 veces al día — el cron de `Publish` (cada 15 min) disparaba `Deploy` vía `workflow_run` aunque no hubiera nada nuevo publicado. Se agregó un chequeo en `deploy.yml` que compara el commit actual contra el último deploy de producción en Vercel y omite el build/deploy si son iguales (detalle técnico en `CLAUDE.md`). La cuota gratuita debería recuperarse ~24h después del incidente; no hace falta pasar a Vercel Pro por esto.
 
 ## Convenciones de trabajo con Moncho (para la próxima sesión)
 
