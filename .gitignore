@@ -17,7 +17,11 @@ out/
 .DS_Store
 
 # Brand source assets — large binaries, not needed to build/run the site
-VIDEOS/
+# Material de video crudo (solo la carpeta de la raíz). Anclada con `/`
+# porque este repo vive en un volumen exFAT y git corre con
+# core.ignorecase=true: sin el ancla, `VIDEOS/` también capturaba
+# `app/videos/`, que quedó fuera del repo sin que nadie lo notara.
+/VIDEOS/
 USO DE REDES/
 LOGO/*.ai
 TOMO LA PALABRA_BRANDBOOK 2025.pdf
