@@ -35,6 +35,17 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
+          # Un deploy pedido a mano (workflow_dispatch) siempre debe correr:
+          # es la única forma de recoger cambios que no viven en el commit,
+          # como variables de entorno nuevas en Vercel. Además, `vercel deploy
+          # --prebuilt` produce deployments que Vercel se niega a redesplegar
+          # desde su dashboard ("Prebuilt deployments cannot be redeployed"),
+          # así que sin esta salida no habría ninguna manera de forzarlo.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Deploy manual: se omite el chequeo de deduplicación."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
           LATEST_SHA=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=production&limit=1&state=READY" \
