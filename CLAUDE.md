@@ -59,13 +59,57 @@ Si `drive.files.create` o `docs.documents.create` empiezan a fallar con `storage
 - `transcribe.yml` — cron `*/30 * * * *`, corre `watchEntrevistas`.
 - `publish.yml` — cron `*/15 * * * *`, corre `watchPublicar`. Necesita `permissions: contents: write` y `git config user.name/email` (no vienen por defecto).
 - `deploy.yml` — **no** se dispara solo con `on: push` cuando el push lo hace otro workflow con el `GITHUB_TOKEN` por defecto (regla anti-loop de GitHub). Por eso también escucha `workflow_run` sobre la conclusión de `Publish`, y hace checkout del `head_sha` exacto que Publish empujó. Si algún día una nota publicada no aparece en el sitio, revisar primero si `Deploy` corrió después de `Publish`.
+  - Un deploy pedido a mano (`workflow_dispatch`, desde Actions → Deploy → Run workflow) **se
+    salta ese chequeo a propósito**: es la única forma de recoger cambios que no viven en el
+    commit, como variables de entorno nuevas en Vercel. Hace falta porque `vercel deploy
+    --prebuilt` produce deployments que Vercel se niega a redesplegar desde su dashboard
+    ("Prebuilt deployments cannot be redeployed"); sin esta salida no habría manera de forzar un
+    deploy sin inventar un commit.
   - `Publish` corre cada 15 min y termina en éxito aunque no haya nada nuevo que publicar, así que `workflow_run` disparaba un `vercel deploy` real en cada tick (~70-95/día) aunque el commit no hubiera cambiado. Eso agotó la cuota gratuita de subida de Vercel (5000/día, error `api-upload-free`) el 2026-08-09. Fix: `deploy.yml` ahora consulta la API de Vercel (`GET /v6/deployments?target=production`) por el `githubCommitSha` del último deploy en producción y **omite build/deploy** si coincide con el commit actual. Si Vercel algún día deja de exponer `meta.githubCommitSha` en esa respuesta (o cambia el shape del JSON), el chequeo falla abierto (`skip=false`) y despliega igual — no se queda bloqueado, pero tampoco dedupea.
 
 Todos los secrets (API keys + credenciales de Google + IDs de Drive, aunque estos últimos no son sensibles) están en GitHub Secrets del repo. Los valores reales solo existen ahí y en `.env.local` de Moncho — nunca en el código.
 
+## El repo vive en un disco exFAT — dos trampas de git
+
+El proyecto está en `/Volumes/Pikachu`, un volumen exFAT que no guarda permisos Unix ni
+distingue mayúsculas. Eso cambia el comportamiento de git de dos formas que ya causaron
+problemas reales:
+
+- **`core.fileMode`**: sin desactivarlo, los 78 archivos del repo aparecen como modificados
+  (`100644 => 100755`) sin que nadie los haya tocado. Ya está puesto `core.fileMode=false` en
+  la config local. Si aparece un `git status` con todo el repo modificado, es esto.
+- **`core.ignorecase=true`** (autodetectado): los patrones de `.gitignore` dejan de distinguir
+  mayúsculas. La regla `VIDEOS/` —pensada para el material de video crudo de la raíz— también
+  capturaba `app/videos/`, que quedó fuera del repo sin que nadie lo notara hasta que `/videos`
+  dio 404 en producción mientras funcionaba perfecto en local. **Toda regla de `.gitignore` que
+  apunte a una carpeta de la raíz debe ir anclada con `/` al inicio** (`/VIDEOS/`,
+  `/presentacion-flujo/`, `/manual-editorial/`). Sin el ancla, un patrón coincide a cualquier
+  profundidad.
+
+Si algo funciona en local pero no en producción, `git ls-files <ruta>` y `git check-ignore -v
+<ruta>` son el primer diagnóstico: el build de CI solo ve lo que está en el repo.
+
 ## Variables de entorno
 
 Ver `.env.example` para la lista completa con comentarios. Nunca leer `.env.local` directo (contiene secretos reales) — para verificar que algo está seteado, usar `grep -c "NOMBRE=" .env.local` o revisar longitud (`awk -F= '{print length($2)}'`), no el valor.
+
+## Sección /videos (YouTube Data API)
+
+`lib/youtube.ts` lee la playlist de subidas del canal (`UC3bxUswJgceF-gA7GEXAV2w`) y muestra
+los 50 más recientes; es la única parte del sitio que lee datos externos en vivo en vez de los
+`.mdx` versionados. Revalida cada 30 min por ISR, así que un video nuevo aparece solo, sin
+deploy. 50 es el tope de una página de la API — más allá habría que paginar con `pageToken`.
+
+`YOUTUBE_API_KEY` y `YOUTUBE_CHANNEL_ID` viven **en Vercel (Production) y en `.env.local`**, no
+en GitHub Secrets: `deploy.yml` las obtiene con `vercel pull`.
+
+**Gotcha de Vercel — Secret vs Config**: al crear una variable, Vercel ofrece tipo `Secret`
+(antes "Sensitive") o `Config`. Las `Secret` **no se pueden descargar con `vercel pull`**: el
+CLI escribe el literal `[SENSITIVE]` como placeholder y el build sigue adelante con ese valor.
+El síntoma no es un error sino una página que dice "no se encontraron videos", porque la
+variable existe y no está vacía. Como el build corre en GitHub Actions y no en Vercel, **toda
+variable que el build necesite tiene que ser `Config`**. El flag no se puede cambiar después:
+hay que borrar la variable y recrearla.
 
 ## Sistema de diseño
 
@@ -74,6 +118,27 @@ Colores y tipografías del brandbook real (`TOMO LA PALABRA_BRANDBOOK 2025.pdf`,
 ## Accesibilidad
 
 El sitio debe cumplir **WCAG 2.1 nivel AA** — hay usuarios reales de lector de pantalla en el equipo editorial de Tomo la Palabra, así que esto no es opcional ni cosmético. Ya se hizo una pasada completa (skip-link, foco visible en todo fondo, jerarquía de encabezados, contraste de texto, títulos de página únicos, sin links duplicados). Cualquier componente o página nueva debe mantener ese estándar: alt text real (o `alt=""` si es puramente decorativo/redundante junto a un link con el mismo destino), jerarquía de encabezados sin saltos, contraste mínimo 4.5:1 en texto normal, y todo interactivo debe funcionar con teclado.
+
+## Manual editorial (SOP)
+
+`manual-editorial/` (gitignored) tiene el manual de publicación para el equipo de TLP: el
+recorrido de video crudo a nota publicada, escrito para gente que no toca código. Fuente en
+`index.html`, con la paleta y las fuentes del sitio. Regenerar el PDF:
+
+```bash
+cd manual-editorial && "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --disable-gpu --no-pdf-header-footer \
+  --print-to-pdf="manual-publicacion-tomo-la-palabra.pdf" \
+  --virtual-time-budget=10000 "file://$(pwd)/index.html"
+```
+
+El HTML maqueta páginas carta con `@page { size: letter }` y un `div.page` por página; **no hay
+reflujo automático**, así que si se agrega contenido hay que revisar el PDF página por página
+para que no se desborde sobre el pie. Mismo patrón que `presentacion-flujo/`.
+
+Si se cambia el pipeline (encabezados del Doc, taxonomía, manejo de imágenes, tiempos de cron),
+**el manual queda desactualizado y hay que regenerarlo** — documenta comportamiento real, no
+intenciones.
 
 ## Reutilizado de otros proyectos (referencia, no código compartido)
 

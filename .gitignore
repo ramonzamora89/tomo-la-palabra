@@ -15,6 +15,9 @@ out/
 
 # Editor / OS
 .DS_Store
+# Metadatos AppleDouble que macOS crea en volúmenes exFAT (este repo vive
+# en un disco externo). Uno por archivo, puro ruido en git status.
+._*
 
 # Brand source assets — large binaries, not needed to build/run the site
 # Material de video crudo (solo la carpeta de la raíz). Anclada con `/`
@@ -39,7 +42,12 @@ client_secret_*.json
 *-33ed9348189c.json
 
 # Business presentation deck — not site source, kept out of this repo
-presentacion-flujo/
+/presentacion-flujo/
+
+# Manual de publicación para el equipo editorial (HTML fuente + PDF).
+# Documentación operativa, no código del sitio. Se regenera con Chrome
+# headless — ver CLAUDE.md.
+/manual-editorial/
 
 # Local Claude Code session state
 .claude/
