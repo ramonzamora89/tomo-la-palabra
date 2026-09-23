@@ -54,8 +54,11 @@ async function processVideo(
     return;
   }
 
-  const videoPath = path.join(tmpDir, video.name!);
-  const audioPath = videoPath.replace(path.extname(videoPath), ".wav");
+  // Name temp files by Drive ID, not title: the team renames videos freely
+  // (no extension, trailing spaces), and ffmpeg sniffs the input format
+  // from content anyway.
+  const videoPath = path.join(tmpDir, `${video.id}.video`);
+  const audioPath = path.join(tmpDir, `${video.id}.wav`);
 
   console.log("Descargando video...");
   await downloadDriveFile(drive, video.id!, videoPath);
@@ -121,8 +124,20 @@ async function main() {
   const tmpDir = path.join(process.cwd(), "pipeline", "tmp");
   fs.mkdirSync(tmpDir, { recursive: true });
 
+  // One bad file must not block the rest of the folder; still fail the run
+  // at the end so the error surfaces in Actions.
+  const failed: string[] = [];
   for (const video of videos) {
-    await processVideo(drive, docs, driveAsUser, video, tmpDir);
+    try {
+      await processVideo(drive, docs, driveAsUser, video, tmpDir);
+    } catch (err) {
+      console.error(`Error procesando "${video.name}":`, err);
+      failed.push(video.name ?? video.id!);
+    }
+  }
+
+  if (failed.length > 0) {
+    throw new Error(`Fallaron ${failed.length} video(s): ${failed.join(", ")}`);
   }
 }
 
