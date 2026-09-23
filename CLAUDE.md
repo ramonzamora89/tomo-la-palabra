@@ -54,6 +54,19 @@ Flujo: `watchEntrevistas.ts` (cron cada 30 min) → Deepgram (nova-3, es-419, di
 
 Si `drive.files.create` o `docs.documents.create` empiezan a fallar con `storageQuotaExceeded` o `The caller does not have permission`, es este mismo problema — no es una regresión de permisos, es la limitación de Google. Ver `pipeline/src/lib/googleClients.ts` y `pipeline/src/oauthSetup.ts`.
 
+**`invalid_grant` al "Creando Google Doc" = refresh token vencido o revocado.** Mientras la app
+de OAuth estuvo en modo **Testing** en Google Cloud Console, Google hacía vencer el refresh token
+a los 7 días. Eso pasó el 2026-09-23: los videos se transcribían y redactaban (gastando
+Deepgram y Claude) y fallaban en el último paso. Desde ese día la app está **In production**
+(sin verificar, cosa que para uso propio no hace falta; el login muestra la advertencia de "app
+no verificada", que se pasa con *Avanzado → Ir a…*). Si vuelve a aparecer: revisar que siga en
+producción, correr `npm run pipeline:google-oauth-setup` **en una terminal propia** (imprime el
+token en pantalla) y actualizar el valor en `.env.local` y en `gh secret set
+GOOGLE_OAUTH_REFRESH_TOKEN`. Google exige una URL de política de privacidad para estar en
+producción: es `app/privacidad/page.tsx`, que describe solo la herramienta interna, no el sitio.
+Los avisos de "Branding verification" (dominio no registrado, nombre distinto) solo aplican si
+se quiere la verificación de marca y se pueden ignorar.
+
 ## GitHub Actions
 
 - `transcribe.yml` — cron `*/30 * * * *`, corre `watchEntrevistas`.
