@@ -4,7 +4,7 @@
 
 Tomo la Palabra es un medio guatemalteco nuevo, hasta ahora solo en redes sociales, enfocado en entrevistas en video largas que le dan voz a la gente común. Este proyecto es su sitio web: se alimenta directamente de un flujo editorial en Google Drive (ver `CLAUDE.md` para el detalle técnico), sin que el equipo editorial necesite tocar código.
 
-- **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` sigue funcionando)
+- **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` y `www` redirigen con 308 aquí)
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra
 - **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM` (cuenta personal de Moncho, compartida como Editor con la service account `ramon@labetnografico.com`)
 - **Presentación del flujo** (para el equipo de TLP): `presentacion-flujo/propuesta.pdf` y `.pptx` en este mismo directorio (no está en git).

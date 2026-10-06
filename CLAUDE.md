@@ -6,7 +6,7 @@ Instrucciones técnicas para trabajar en este repo. Para contexto de negocio, es
 
 Sitio web (Next.js) + pipeline de contenido para Tomo la Palabra, un medio guatemalteco de entrevistas en video. El contenido nace en Google Drive (video → transcripción → borrador → revisión humana → publicación) y termina como archivos `.mdx` versionados en este mismo repo. No hay CMS ni base de datos externa — el repo es la fuente de verdad del contenido publicado.
 
-- **Sitio en vivo**: https://tomolapalabra.com (dominio en GoDaddy, DNS apuntando a Vercel: `A @ → 216.198.79.1` y `CNAME www → c5a9c8376c59da29.vercel-dns-017.com`; `www` redirige con 308 al dominio sin `www`). `https://tomo-la-palabra.vercel.app` sigue respondiendo y es la URL de `/privacidad` registrada en la pantalla de consentimiento de OAuth: no cambiarla.
+- **Sitio en vivo**: https://tomolapalabra.com (dominio en GoDaddy, DNS apuntando a Vercel: `A @ → 216.198.79.1` y `CNAME www → c5a9c8376c59da29.vercel-dns-017.com`; `www` redirige con 308 al dominio sin `www`). `https://tomo-la-palabra.vercel.app` también redirige con 308 a `tomolapalabra.com` conservando la ruta, así que los links viejos del Registro siguen funcionando. La pantalla de consentimiento de OAuth todavía tiene registrada `https://tomo-la-palabra.vercel.app/privacidad` (llega por redirect); si Google la rechaza algún día, cambiarla a `https://tomolapalabra.com/privacidad`.
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra (público)
 
 ## Stack
