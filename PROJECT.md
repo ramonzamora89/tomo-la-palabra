@@ -27,6 +27,15 @@ Sesión dedicada a conectar Google con el sitio y a documentar el flujo para el 
 3. **Monetización de YouTube**: el canal **ya califica para el Programa de Socios completo**, con anuncios — 1,409 suscriptores (se piden 1,000) y 15.1 K horas de reproducción en los últimos 12 meses (se piden 4,000). Prácticamente todo ese tiempo viene de los videos largos, que es lo que cuenta; los Shorts no suman al criterio. Incluso supera el umbral de 8,000 horas que entra en vigor el 1 de febrero de 2027 para nuevos solicitantes.
 4. **AdSense en trámite**, a registrarse en **Guatemala** (donde opera el medio y está el equipo). Pendiente: la verificación telefónica se topó con el límite de reintentos de Google.
 
+## Estado (6 de octubre, 2026)
+
+Sesión dedicada a conectar el dominio propio:
+
+1. **`tomolapalabra.com` en vivo**, con HTTPS. El dominio está registrado en GoDaddy, que sigue manejando los DNS (no se cambiaron los nameservers), y apunta a Vercel. Los registros están en `CLAUDE.md`.
+2. **Dominio canónico sin `www`.** Vercel propuso `www` como principal y hubo que invertirlo. Ahora `www.tomolapalabra.com` y `tomo-la-palabra.vercel.app` redirigen con 308 a `tomolapalabra.com` y conservan la ruta, así que los links viejos del Registro siguen funcionando.
+3. **El pipeline anota las URLs nuevas.** `NEXT_PUBLIC_SITE_URL` ahora es `https://tomolapalabra.com` en `publish.yml` y `watchPublicar.ts`. Las filas anteriores del Registro conservan `vercel.app`, que funciona por el redirect.
+4. **Google Search Console**: propiedad de dominio verificada por TXT, sitemap enviado y leído sin errores (263 páginas descubiertas), e indexación de la portada solicitada a mano. Los resultados de búsqueda deberían empezar a aparecer en días, y los informes completos en una o dos semanas.
+
 ## Decisiones ya tomadas
 
 - Video embebido de YouTube (no autohospedado).
@@ -47,6 +56,7 @@ Sesión dedicada a conectar Google con el sitio y a documentar el flujo para el 
 
 ## Pendientes técnicos conocidos
 
+- **Canonical explícito**: el sitio no emite `<link rel="canonical">` (solo hay `metadataBase` en `app/layout.tsx`). Hoy no urge porque los redirects 308 evitan contenido duplicado, pero conviene declararlo con `alternates.canonical` en la metadata de cada página, sobre todo en las notas.
 - **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia — el sitio usa sustitutos de Google Fonts (ver nota en `app/layout.tsx`). Conseguir las fuentes reales de Voice Agency (la agencia que hizo el brandbook).
 - **Migrar el flujo de Drive a la cuenta institucional (YoTomoLaPalabra)**: hoy las carpetas del pipeline viven en el Drive personal de Moncho y las credenciales de Google son de esa cuenta. Al migrar hay que: mover las cuatro carpetas + el Sheet del Registro, re-compartirlas con la service account, **generar credenciales nuevas y revocar las actuales** (JSON de la service account y `GOOGLE_OAUTH_REFRESH_TOKEN`, este último con `npm run pipeline:google-oauth-setup` logueado en la cuenta nueva), y actualizar los IDs y secretos en `.env.local` y GitHub Secrets. Ojo: la cuenta institucional también es Gmail personal, así que la limitación de cuota de storage de las service accounts (ver `CLAUDE.md`) **sigue aplicando** — la migración no la resuelve.
 - **Paginación de `/videos`**: hoy muestra hasta 50 videos, que es el tope de una página de la API de YouTube. Cuando el canal pase de 50 habrá que paginar con `pageToken` (`lib/youtube.ts`).

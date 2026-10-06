@@ -67,6 +67,12 @@ producción: es `app/privacidad/page.tsx`, que describe solo la herramienta inte
 Los avisos de "Branding verification" (dominio no registrado, nombre distinto) solo aplican si
 se quiere la verificación de marca y se pueden ignorar.
 
+## Dominio (GoDaddy → Vercel)
+
+`tomolapalabra.com` está registrado en GoDaddy, que sigue manejando los DNS con sus nameservers (`ns25/ns26.domaincontrol.com`); no se delegó a Vercel DNS. Solo hay dos registros relevantes: `A @ → 216.198.79.1` y `CNAME www → c5a9c8376c59da29.vercel-dns-017.com` (los valores "nuevos" que recomienda Vercel; los legacy `76.76.21.21` y `cname.vercel-dns.com` también funcionarían). En Vercel → Domains, el dominio sin `www` es el de Production, y tanto `www` como `tomo-la-palabra.vercel.app` redirigen con 308. Al agregar un dominio, Vercel propone `www` como principal por defecto, lo que contradice `lib/seo.ts` y el pipeline: si se reconfigura, revisar que no vuelva a quedar invertido.
+
+Para diagnosticar DNS sin esperar la propagación, se puede preguntar directo a GoDaddy: `dig +short tomolapalabra.com A @ns25.domaincontrol.com`. Si devuelve `3.33.130.190` / `15.197.148.33`, son las IP de "Parked" de GoDaddy: es **un solo** registro `A` que resuelve a dos IP, no dos registros. El TXT `google-site-verification=…` en la raíz es la verificación de Search Console: no borrarlo.
+
 ## GitHub Actions
 
 - `transcribe.yml` — cron `*/30 * * * *`, corre `watchEntrevistas`.
