@@ -4,7 +4,7 @@
 
 Tomo la Palabra es un medio guatemalteco nuevo, hasta ahora solo en redes sociales, enfocado en entrevistas en video largas que le dan voz a la gente común. Este proyecto es su sitio web: se alimenta directamente de un flujo editorial en Google Drive (ver `CLAUDE.md` para el detalle técnico), sin que el equipo editorial necesite tocar código.
 
-- **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` y `www` redirigen con 308 aquí)
+- **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` y `www` redirigen con 308 aquí). Verificado en Google Search Console como propiedad de dominio (TXT en GoDaddy), con el sitemap enviado el mismo día
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra
 - **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM` (cuenta personal de Moncho, compartida como Editor con la service account `ramon@labetnografico.com`)
 - **Presentación del flujo** (para el equipo de TLP): `presentacion-flujo/propuesta.pdf` y `.pptx` en este mismo directorio (no está en git).
@@ -47,7 +47,6 @@ Sesión dedicada a conectar Google con el sitio y a documentar el flujo para el 
 
 ## Pendientes técnicos conocidos
 
-- **Search Console**: dar de alta `tomolapalabra.com` en Google Search Console (verificación por TXT en GoDaddy) y enviar `https://tomolapalabra.com/sitemap.xml`. El dominio quedó conectado el 2026-10-06; esto es lo único que faltó de esa tarea.
 - **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia — el sitio usa sustitutos de Google Fonts (ver nota en `app/layout.tsx`). Conseguir las fuentes reales de Voice Agency (la agencia que hizo el brandbook).
 - **Migrar el flujo de Drive a la cuenta institucional (YoTomoLaPalabra)**: hoy las carpetas del pipeline viven en el Drive personal de Moncho y las credenciales de Google son de esa cuenta. Al migrar hay que: mover las cuatro carpetas + el Sheet del Registro, re-compartirlas con la service account, **generar credenciales nuevas y revocar las actuales** (JSON de la service account y `GOOGLE_OAUTH_REFRESH_TOKEN`, este último con `npm run pipeline:google-oauth-setup` logueado en la cuenta nueva), y actualizar los IDs y secretos en `.env.local` y GitHub Secrets. Ojo: la cuenta institucional también es Gmail personal, así que la limitación de cuota de storage de las service accounts (ver `CLAUDE.md`) **sigue aplicando** — la migración no la resuelve.
 - **Paginación de `/videos`**: hoy muestra hasta 50 videos, que es el tope de una página de la API de YouTube. Cuando el canal pase de 50 habrá que paginar con `pageToken` (`lib/youtube.ts`).
