@@ -12,7 +12,7 @@ import { ensureLedgerHeader, appendLedgerRow } from "./lib/updateLedger";
 
 const REPO_ROOT = process.cwd();
 const DEFAULT_AUTHOR = "Redacción Tomo la Palabra";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tomo-la-palabra.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tomolapalabra.com";
 // Pass a test branch while verifying by hand (plan's M9 milestone) —
 // undefined pushes to whatever branch is currently checked out (main in CI).
 const PUBLISH_BRANCH = process.env.PUBLISH_BRANCH;

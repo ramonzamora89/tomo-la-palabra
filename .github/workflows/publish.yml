@@ -41,5 +41,5 @@ jobs:
           DRIVE_FOLDER_PUBLICAR_ID: ${{ secrets.DRIVE_FOLDER_PUBLICAR_ID }}
           DRIVE_FOLDER_ARCHIVO_ID: ${{ secrets.DRIVE_FOLDER_ARCHIVO_ID }}
           DRIVE_LEDGER_SHEET_ID: ${{ secrets.DRIVE_LEDGER_SHEET_ID }}
-          NEXT_PUBLIC_SITE_URL: https://tomo-la-palabra.vercel.app
+          NEXT_PUBLIC_SITE_URL: https://tomolapalabra.com
         run: npm run pipeline:watch-publicar
