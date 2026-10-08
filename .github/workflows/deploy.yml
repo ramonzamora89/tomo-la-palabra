@@ -19,9 +19,13 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
+      # After Publish, deploy the tip of its branch — NOT workflow_run.head_sha,
+      # which is the commit Publish *ran on*, i.e. the one before the note it
+      # just pushed. Using head_sha left every new note off the site until
+      # the next cron tick (15-30 min late).
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
       # Publish runs on a 15-min cron and completes successfully even when
       # there's nothing new to publish, which used to trigger a real
@@ -46,7 +50,7 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          SHA="$(git rev-parse HEAD)"
           LATEST_SHA=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=production&limit=1&state=READY" \
             | jq -r '.deployments[0].meta.githubCommitSha // empty' || echo "")

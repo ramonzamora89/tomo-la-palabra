@@ -92,7 +92,7 @@ Para diagnosticar DNS sin esperar la propagación, se puede preguntar directo a 
 
 - `transcribe.yml` — cron `*/30 * * * *`, corre `watchEntrevistas`.
 - `publish.yml` — cron `*/15 * * * *`, corre `watchPublicar`. Necesita `permissions: contents: write` y `git config user.name/email` (no vienen por defecto).
-- `deploy.yml` — **no** se dispara solo con `on: push` cuando el push lo hace otro workflow con el `GITHUB_TOKEN` por defecto (regla anti-loop de GitHub). Por eso también escucha `workflow_run` sobre la conclusión de `Publish`, y hace checkout del `head_sha` exacto que Publish empujó. Si algún día una nota publicada no aparece en el sitio, revisar primero si `Deploy` corrió después de `Publish`.
+- `deploy.yml` — **no** se dispara solo con `on: push` cuando el push lo hace otro workflow con el `GITHUB_TOKEN` por defecto (regla anti-loop de GitHub). Por eso también escucha `workflow_run` sobre la conclusión de `Publish`, y hace checkout de la **punta de la rama** (`workflow_run.head_branch`). Ojo: `workflow_run.head_sha` es el commit sobre el que *corrió* Publish, no el que empujó; hasta octubre de 2026 se usaba ese, y cada nota nueva salía en vivo recién en el siguiente ciclo del cron (15-30 min tarde). Si algún día una nota publicada no aparece en el sitio, revisar primero si `Deploy` corrió después de `Publish`.
   - Un deploy pedido a mano (`workflow_dispatch`, desde Actions → Deploy → Run workflow) **se
     salta ese chequeo a propósito**: es la única forma de recoger cambios que no viven en el
     commit, como variables de entorno nuevas en Vercel. Hace falta porque `vercel deploy
