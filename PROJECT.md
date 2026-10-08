@@ -8,7 +8,7 @@ Tomo la Palabra es un medio guatemalteco nuevo, hasta ahora solo en redes social
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra
 - **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM` (cuenta personal de Moncho, compartida como Editor con la service account `ramon@labetnografico.com`)
 - **Presentación del flujo** (para el equipo de TLP): `presentacion-flujo/propuesta.pdf` y `.pptx` en este mismo directorio (no está en git).
-- **Manual de publicación** (SOP para el equipo editorial): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`, 10 páginas con el branding del medio (no está en git — ver `CLAUDE.md` para regenerarlo).
+- **Manual de publicación** (SOP para el equipo editorial): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`, 12 páginas con el branding del medio, versión 1.1 (7 de octubre de 2026: fotos, secciones, autor, destacada y Opinión) (no está en git — ver `CLAUDE.md` para regenerarlo).
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` — 1,409 suscriptores, 46 videos, 15.1 K horas de reproducción (al 7 de septiembre de 2026).
 
 ## Estado (31 de julio, 2026)
@@ -69,7 +69,6 @@ Primera ronda de pedidos del equipo después de revisar el sitio:
 ## Pendientes técnicos conocidos
 
 - **Corrección sin publicar en "La Canche y El Chaiwa"**: el Doc de Archivo tiene el titular corregido ("El Shaiwa"), pero nunca se republicó. Al arrastrarlo a Publicar, la nota cambia de URL y la vieja redirige.
-- **Manual editorial**: desactualizado desde el 2026-10-07 (fotos, autor, destacada, secciones, Opinión). Regenerarlo.
 
 - **Canonical explícito**: el sitio no emite `<link rel="canonical">` (solo hay `metadataBase` en `app/layout.tsx`). Hoy no urge porque los redirects 308 evitan contenido duplicado, pero conviene declararlo con `alternates.canonical` en la metadata de cada página, sobre todo en las notas.
 - **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia — el sitio usa sustitutos de Google Fonts (ver nota en `app/layout.tsx`). Conseguir las fuentes reales de Voice Agency (la agencia que hizo el brandbook).
