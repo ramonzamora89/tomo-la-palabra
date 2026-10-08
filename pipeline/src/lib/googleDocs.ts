@@ -26,6 +26,11 @@ export function buildDraftDocRequests(
     { heading: "Imágenes", body: draft.imagenesNotas },
     { heading: "Tags", body: draft.tags.join(", ") },
     { heading: "YouTube URL", body: youtubeUrl || "(pendiente)" },
+    // Only links are read here — this hint is ignored when publishing.
+    {
+      heading: "Videos cortos",
+      body: "(Opcional: pegá aquí links de Reels, TikTok o YouTube Shorts, uno por línea)",
+    },
     { heading: "Transcripción completa", body: transcript },
   ];
 

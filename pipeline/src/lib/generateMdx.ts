@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { ParsedDoc } from "./parseDoc";
 import type { DocImage } from "./downloadImages";
+import type { VideoCorto } from "../../../lib/videosCortos";
 import { extractYoutubeVideoId, todayInGuatemala } from "./slug";
 import { resolveCategoria } from "../../../content/taxonomy/categorias";
 
@@ -22,6 +23,7 @@ export function generateMdxFile(params: {
   slug: string;
   author: string;
   images: DocImage[];
+  videosCortos?: VideoCorto[];
   repoRoot: string;
   documentId: string;
   /** Path of this same note under its old slug, when the Titular changed. */
@@ -86,6 +88,8 @@ export function generateMdxFile(params: {
       height: img.height,
     }));
   }
+
+  if (params.videosCortos?.length) frontmatter.videosCortos = params.videosCortos;
 
   frontmatter.sourceDocId = documentId;
 

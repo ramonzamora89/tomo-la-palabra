@@ -11,6 +11,7 @@ import { commitAndPush } from "./lib/gitCommit";
 import { moveDocToArchivo } from "./lib/moveToArchivo";
 import { ensureLedgerHeader, appendLedgerRow } from "./lib/updateLedger";
 import { findPreviousSlug, retireOldSlug } from "./lib/renamedNota";
+import { extractVideosCortos } from "./lib/extractVideosCortos";
 
 const REPO_ROOT = process.cwd();
 const DEFAULT_AUTHOR = "Redacción Tomo la Palabra";
@@ -48,12 +49,16 @@ async function processDoc(
   const images = await downloadDocImages(document, imagesDir);
   console.log(`  ${images.length} imagen(es) encontradas en el Doc.`);
 
+  const videosCortos = await extractVideosCortos(sections.videosCortos);
+  if (videosCortos.length) console.log(`  ${videosCortos.length} video(s) corto(s) para incrustar.`);
+
   const previousSlug = findPreviousSlug(REPO_ROOT, documentId, slug);
   const { filePath } = generateMdxFile({
     sections,
     slug,
     author,
     images,
+    videosCortos,
     repoRoot: REPO_ROOT,
     documentId,
     previousFilePath: previousSlug

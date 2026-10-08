@@ -34,6 +34,17 @@ export const notaSchema = z.object({
     .default([]),
   // Optional: an Opinión piece may not originate from a video interview.
   youtubeUrl: z.string().optional(),
+  // Reels / TikToks / Shorts from the Doc's "Videos cortos" heading
+  // (lib/videosCortos.ts), embedded at the end of the note.
+  videosCortos: z
+    .array(
+      z.object({
+        plataforma: z.enum(["instagram", "tiktok", "youtube"]),
+        id: z.string(),
+        url: z.string(),
+      }),
+    )
+    .default([]),
   youtubeVideoId: z.string().optional(),
   videoDurationSeconds: z.number().optional(),
   canonicalUrl: z.string().optional(),

@@ -29,7 +29,22 @@ const HEADING_KEYS: Record<string, string> = {
   tags: "tags",
   "youtube url": "youtubeUrl",
   "transcripcion completa": "transcripcion",
+  // Links to Reels / TikToks / Shorts, one per line, embedded at the end
+  // of the note. Per-network headings are accepted too and merged.
+  "videos cortos": "videosCortos",
+  "video corto": "videosCortos",
+  "redes sociales": "videosCortos",
+  instagram: "videosCortos",
+  reels: "videosCortos",
+  tiktok: "videosCortos",
+  "youtube shorts": "videosCortos",
+  shorts: "videosCortos",
 };
+
+// Sections where a pasted link may show only its display text ("ver
+// reel") — the real URL lives in the text run's link style, so it's
+// appended to the section text.
+const LINK_SECTIONS = new Set(["videosCortos"]);
 
 const HEADING_STYLES = new Set(["HEADING_1", "HEADING_2"]);
 const DIACRITICS_REGEX = new RegExp("[̀-ͯ]", "g");
@@ -46,6 +61,12 @@ function paragraphText(paragraph: docs_v1.Schema$Paragraph): string {
   return (paragraph.elements ?? []).map((el) => el.textRun?.content ?? "").join("");
 }
 
+function paragraphLinks(paragraph: docs_v1.Schema$Paragraph): string[] {
+  return (paragraph.elements ?? [])
+    .map((el) => el.textRun?.textStyle?.link?.url)
+    .filter((url): url is string => Boolean(url));
+}
+
 export type ParsedDoc = Record<string, string>;
 
 export function parseDocSections(document: docs_v1.Schema$Document): ParsedDoc {
@@ -55,7 +76,9 @@ export function parseDocSections(document: docs_v1.Schema$Document): ParsedDoc {
 
   function flush() {
     if (currentKey) {
-      sections[currentKey] = buffer.join("").trim();
+      const text = buffer.join("").trim();
+      // A key can repeat (e.g. "Instagram" and "TikTok" headings) — merge.
+      sections[currentKey] = sections[currentKey] ? `${sections[currentKey]}\n${text}` : text;
     }
     buffer = [];
   }
@@ -78,6 +101,9 @@ export function parseDocSections(document: docs_v1.Schema$Document): ParsedDoc {
 
     if (currentKey) {
       buffer.push(text);
+      if (LINK_SECTIONS.has(currentKey)) {
+        for (const url of paragraphLinks(paragraph)) buffer.push(`${url}\n`);
+      }
     }
   }
   flush();
