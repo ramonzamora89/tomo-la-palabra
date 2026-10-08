@@ -7,6 +7,7 @@ Tomo la Palabra es un medio guatemalteco nuevo, hasta ahora solo en redes social
 - **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` y `www` redirigen con 308 aquí). Verificado en Google Search Console como propiedad de dominio (TXT en GoDaddy), con el sitemap enviado el mismo día
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra
 - **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM` (cuenta personal de Moncho, compartida como Editor con la service account `ramon@labetnografico.com`)
+- **Guía de uso del sistema** (web, con accesos directos a carpetas y plantillas): https://claude.ai/artifact/K7WnY5mBj9XmxyF3k8pZb2 — privada; se comparte desde su menú Compartir.
 - **Presentación del flujo** (para el equipo de TLP): `presentacion-flujo/propuesta.pdf` y `.pptx` en este mismo directorio (no está en git).
 - **Manual de publicación** (SOP para el equipo editorial): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`, 12 páginas con el branding del medio, versión 1.1 (7 de octubre de 2026: fotos, secciones, autor, destacada y Opinión) (no está en git — ver `CLAUDE.md` para regenerarlo).
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` — 1,409 suscriptores, 46 videos, 15.1 K horas de reproducción (al 7 de septiembre de 2026).
@@ -44,7 +45,7 @@ Primera ronda de pedidos del equipo después de revisar el sitio:
 2. **Secciones definitivas**: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle y Opinión, con las descripciones del equipo. Las 32 notas se reclasificaron (también en sus Docs, para que una republicación no lo revierta). "Reportaje" desapareció; su URL redirige a Profundidad.
 3. **Autor**: encabezado `Autor` en el Doc; por defecto, "Redacción Tomo la Palabra".
 4. **Nota destacada**: encabezado `Destacada` (sí/no) en el Doc.
-5. **Opinión**: plantilla de Google Doc en la raíz de Drive y vista propia en el sitio.
+5. **Opinión y nota general**: plantillas de Google Doc en la raíz de Drive (la de nota general habilita notas sin entrevista, que antes estaban fuera del alcance) y vista propia de Opinión en el sitio.
 6. **Se quitaron las 3 notas de ejemplo del andamiaje** (Caso IGSS-Pisa, zona 7, Shai Wa). IGSS-Pisa, con texto de relleno, era la nota principal fija de la portada en vivo.
 7. **Titular cambiado = nota duplicada** (corregido): republicar con otro Titular creaba una URL nueva y dejaba la vieja. Ahora reemplaza la nota y redirige.
 

@@ -37,6 +37,12 @@ async function processDoc(
     console.warn(`"${file.name}" no tiene un Titular reconocible — se omite.`);
     return;
   }
+  // A note with no section wouldn't show up on any section page — almost
+  // always a template copy whose Sección was forgotten. Leave it in Publicar.
+  if (!sections.seccion?.trim()) {
+    console.warn(`"${file.name}" no tiene Sección — se omite hasta que la tenga.`);
+    return;
+  }
 
   const slug = slugify(sections.titular);
   const author = sections.autor?.trim() || DEFAULT_AUTHOR;

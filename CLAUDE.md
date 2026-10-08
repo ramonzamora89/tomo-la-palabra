@@ -25,7 +25,7 @@ npm run pipeline:draft-local -- "ruta/al/archivo.transcripcion.txt"  # solo reda
 npm run pipeline:watch-entrevistas   # flujo real: Entrevistas → Borradores (Drive)
 npm run pipeline:watch-publicar      # flujo real: Publicar → nota en el repo → Archivo
 npm run pipeline:google-oauth-setup  # una sola vez: genera GOOGLE_OAUTH_REFRESH_TOKEN
-npm run pipeline:create-opinion-template -- <folderId>  # recrea la plantilla de Opinión (p. ej. al migrar de cuenta)
+npm run pipeline:create-template -- <general|opinion> <folderId>  # recrea una plantilla (p. ej. al migrar de cuenta)
 ```
 
 `PUBLISH_BRANCH=nombre-rama npm run pipeline:watch-publicar` empuja a una rama de prueba en vez de a `main` — útil para probar sin tocar el sitio en vivo.
@@ -56,7 +56,13 @@ Encabezados opcionales (un Doc viejo sin ellos sigue funcionando):
 
 **Fecha**: `pubDate` usa la fecha de Guatemala (`todayInGuatemala()`); antes era UTC y lo publicado después de las 6 p. m. salía con fecha del día siguiente. Al mostrarla, `formatDate` formatea en UTC porque `"2026-10-07"` se parsea como medianoche UTC.
 
-**Plantilla de Opinión**: Doc "PLANTILLA – Columna de opinión" en la carpeta raíz del proyecto (`1L-AHePlvBAANPLyaUKR9xabce17_zbiE7h2wST9BPds`), sin YouTube URL ni transcripción. El equipo hace una copia, la llena y la arrastra a Publicar. Con Titular vacío el pipeline la salta, así que la plantilla misma nunca se publica. En el sitio, `category: opinion` cambia la firma ("Columna de opinión"), agrega "Sobre …" y el aviso de responsabilidad.
+**Plantillas** (para notas que no salen de una entrevista), en la carpeta raíz del proyecto, creadas con `createTemplate.ts`:
+- "PLANTILLA – Nota general" (`1raiEBZUYPHljitQzt0y_hO5-aOwYjDEV9QOVTqslwrE`): mismos encabezados que el borrador de una entrevista, sin transcripción; Sección vacía a propósito.
+- "PLANTILLA – Columna de opinión" (`1SWsUag2xs5XLQAew7dhiSLVPhBVyRTuH1Y1MQrRaVoE`): Sección ya en Opinión, más "Sobre el autor"; sin YouTube URL. En el sitio, `category: opinion` cambia la firma ("Columna de opinión"), agrega "Sobre …" y el aviso de responsabilidad.
+
+El equipo hace una copia (el link `…/copy` abre el diálogo), la guarda en Borradores y la mueve a Publicar. Todo lo que está antes del primer encabezado (las instrucciones) se ignora. `watchPublicar.ts` salta un Doc con Titular **o Sección** vacíos y lo deja en Publicar, así que una plantilla nunca se publica por accidente.
+
+**Guía de uso para el equipo**: página web con accesos directos a carpetas y plantillas, fuente en `manual-editorial/guia-cms.html` (gitignored, contiene los IDs de Drive), publicada como Artifact privado en https://claude.ai/artifact/K7WnY5mBj9XmxyF3k8pZb2. Para actualizarla, editar el HTML y volver a publicarlo en esa misma URL. Igual que el manual en PDF, queda desactualizada si cambia el pipeline.
 
 **Reprocesar/editar una nota ya publicada**: editar el Doc en Archivo y volver a arrastrarlo a Publicar. Sobreescribe el `.mdx`, reemplaza sus imágenes (borra las que ya no estén en el Doc), **conserva `pubDate`** y marca `updatedDate`. Cada nota guarda `sourceDocId`: si el Titular cambió (slug nuevo), `renamedNota.ts` borra la nota vieja y agrega una redirección 308 en `content/redirects.json`, que lee `next.config.mjs`. Las cadenas se colapsan (A→B→C queda A→C).
 

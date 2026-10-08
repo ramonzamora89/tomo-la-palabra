@@ -12,7 +12,7 @@
     "pipeline:watch-entrevistas": "tsx pipeline/src/watchEntrevistas.ts",
     "pipeline:google-oauth-setup": "tsx pipeline/src/oauthSetup.ts",
     "pipeline:watch-publicar": "tsx pipeline/src/watchPublicar.ts",
-    "pipeline:create-opinion-template": "tsx pipeline/src/createOpinionTemplate.ts"
+    "pipeline:create-template": "tsx pipeline/src/createTemplate.ts"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
