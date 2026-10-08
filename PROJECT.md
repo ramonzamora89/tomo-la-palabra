@@ -1,92 +1,105 @@
 # PROJECT.md — Tomo la Palabra
 
+Contexto de negocio, estado y pendientes. El detalle técnico está en `CLAUDE.md`.
+
 ## Qué es
 
-Tomo la Palabra es un medio guatemalteco nuevo, hasta ahora solo en redes sociales, enfocado en entrevistas en video largas que le dan voz a la gente común. Este proyecto es su sitio web: se alimenta directamente de un flujo editorial en Google Drive (ver `CLAUDE.md` para el detalle técnico), sin que el equipo editorial necesite tocar código.
+Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en entrevistas en video largas que le dan voz a la gente común. Este proyecto es su sitio web, que se alimenta de un flujo editorial en Google Drive: el equipo trabaja con carpetas y documentos de Google, sin tocar código ni entrar a un panel de administración.
 
-- **Sitio**: https://tomolapalabra.com (conectado el 2026-10-06; `tomo-la-palabra.vercel.app` y `www` redirigen con 308 aquí). Verificado en Google Search Console como propiedad de dominio (TXT en GoDaddy), con el sitemap enviado el mismo día
-- **Repo**: https://github.com/ramonzamora89/tomo-la-palabra
-- **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM` (cuenta personal de Moncho, compartida como Editor con la service account `ramon@labetnografico.com`)
-- **Guía de uso del sistema** (web, con accesos directos a carpetas y plantillas): https://claude.ai/artifact/K7WnY5mBj9XmxyF3k8pZb2 — privada; se comparte desde su menú Compartir.
-- **Presentación del flujo** (para el equipo de TLP): `presentacion-flujo/propuesta.pdf` y `.pptx` en este mismo directorio (no está en git).
-- **Manual de publicación** (SOP para el equipo editorial): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`, 12 páginas con el branding del medio, versión 1.1 (7 de octubre de 2026: fotos, secciones, autor, destacada y Opinión) (no está en git — ver `CLAUDE.md` para regenerarlo).
-- **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` — 1,409 suscriptores, 46 videos, 15.1 K horas de reproducción (al 7 de septiembre de 2026).
+## Enlaces
 
-## Estado (31 de julio, 2026)
+- **Sitio**: https://tomolapalabra.com (`www` y `tomo-la-palabra.vercel.app` redirigen con 308). Verificado en Google Search Console como propiedad de dominio, con el sitemap enviado.
+- **Repo**: https://github.com/ramonzamora89/tomo-la-palabra (público)
+- **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM`, en la cuenta personal de Moncho y compartida como Editor con la service account `ramon@labetnografico.com`. Contiene las cuatro carpetas del flujo y las dos plantillas.
+- **Guía de uso del sistema** (web, para el equipo): https://claude.ai/artifact/K7WnY5mBj9XmxyF3k8pZb2. Es privada: se comparte desde su menú Compartir.
+- **Manual de publicación** (PDF, 12 páginas, v1.1 del 8 de octubre de 2026): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`. No está en git.
+- **Presentación del flujo**: `presentacion-flujo/propuesta.pdf` y `.pptx`. No está en git.
+- **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` (1,409 suscriptores y 15.1 K horas de reproducción al 7 de septiembre de 2026).
 
-Los 10 milestones del plan original están completos y verificados de punta a punta con contenido real (3 entrevistas reales procesadas, una nota publicada en vivo, automatización corriendo sola en GitHub Actions). Después de eso se hicieron dos rondas de ajustes ya en producción:
+## Estado actual (8 de octubre de 2026)
 
-1. **Menú móvil**: el nav de categorías se desbordaba en pantallas angostas — se reemplazó por un menú hamburguesa (`components/MobileNav.tsx`), y el header se volvió `sticky` con z-index corregido (antes el Hero de la portada tapaba el menú desplegable).
-2. **Accesibilidad (WCAG 2.1 AA)**: pasada completa — skip-link, foco visible en todo fondo, jerarquía de encabezados corregida, contraste de texto insuficiente corregido (ink-500 fallaba en texto pequeño), títulos de página únicos por categoría/tag, sin links duplicados en las tarjetas. Ver el commit `Accessibility pass against WCAG 2.1 AA` para el detalle completo. Esto sigue siendo un requisito permanente, no un checkbox que ya se marcó — cualquier componente nuevo debe mantener el estándar.
+El sitio está en producción con dominio propio y 32 notas reales. El flujo editorial funciona solo en GitHub Actions:
 
-## Estado (7 de septiembre, 2026)
+- **Tres formas de empezar una nota**: subir una entrevista en video (el borrador se transcribe y redacta solo), o copiar una de las dos plantillas, **Nota general** u **Opinión**. Desde ahí, mover el Doc a Publicar lo publica en unos 15 minutos.
+- **Ocho secciones** definidas por el equipo: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle y Opinión.
+- **Desde el Doc** se controla la firma (`Autor`, por defecto "Redacción Tomo la Palabra"), la nota principal de la portada (`Destacada`), las fotos (todas se publican, repartidas en el texto) y los videos cortos de Instagram, TikTok o YouTube Shorts (`Videos cortos`).
+- **Corregir** una nota es editar su Doc en Archivo y volver a moverlo a Publicar. Conserva la fecha original; si cambió el titular, la URL vieja redirige a la nueva.
 
-Sesión dedicada a conectar Google con el sitio y a documentar el flujo para el equipo:
+## Historial
 
-1. **`/videos` en vivo.** La pasarela del canal quedó conectada y muestra los 46 videos. En el camino aparecieron tres fallas encadenadas, ninguna visible desde afuera: `app/videos/page.tsx` nunca había llegado al repo (lo capturaba una regla de `.gitignore`), el deploy manual estaba bloqueado por el chequeo anti-tormenta de agosto, y las variables de entorno estaban creadas como `Secret` en Vercel, que `vercel pull` no puede bajar. Las tres están documentadas en `CLAUDE.md`.
-2. **Manual de publicación** para el equipo editorial, en PDF con el branding del medio.
-3. **Monetización de YouTube**: el canal **ya califica para el Programa de Socios completo**, con anuncios — 1,409 suscriptores (se piden 1,000) y 15.1 K horas de reproducción en los últimos 12 meses (se piden 4,000). Prácticamente todo ese tiempo viene de los videos largos, que es lo que cuenta; los Shorts no suman al criterio. Incluso supera el umbral de 8,000 horas que entra en vigor el 1 de febrero de 2027 para nuevos solicitantes.
-4. **AdSense en trámite**, a registrarse en **Guatemala** (donde opera el medio y está el equipo). Pendiente: la verificación telefónica se topó con el límite de reintentos de Google.
+### 31 de julio de 2026: lanzamiento
 
-## Estado (6 de octubre, 2026)
+Los 10 milestones del plan original completos y verificados con contenido real. Después, dos ajustes en producción: menú hamburguesa en móvil y una pasada completa de accesibilidad WCAG 2.1 AA (commit `Accessibility pass against WCAG 2.1 AA`). La accesibilidad es un requisito permanente: hay personas usuarias de lector de pantalla en el equipo.
 
-Sesión dedicada a conectar el dominio propio:
+### 7 de septiembre de 2026: videos y manual
 
-1. **`tomolapalabra.com` en vivo**, con HTTPS. El dominio está registrado en GoDaddy, que sigue manejando los DNS (no se cambiaron los nameservers), y apunta a Vercel. Los registros están en `CLAUDE.md`.
-2. **Dominio canónico sin `www`.** Vercel propuso `www` como principal y hubo que invertirlo. Ahora `www.tomolapalabra.com` y `tomo-la-palabra.vercel.app` redirigen con 308 a `tomolapalabra.com` y conservan la ruta, así que los links viejos del Registro siguen funcionando.
-3. **El pipeline anota las URLs nuevas.** `NEXT_PUBLIC_SITE_URL` ahora es `https://tomolapalabra.com` en `publish.yml` y `watchPublicar.ts`. Las filas anteriores del Registro conservan `vercel.app`, que funciona por el redirect.
-4. **Google Search Console**: propiedad de dominio verificada por TXT, sitemap enviado y leído sin errores (263 páginas descubiertas), e indexación de la portada solicitada a mano. Los resultados de búsqueda deberían empezar a aparecer en días, y los informes completos en una o dos semanas.
+- **`/videos` en vivo**, conectada al canal. Salieron tres fallas encadenadas, documentadas en `CLAUDE.md`: una regla de `.gitignore` que dejaba `app/videos/` fuera del repo, el chequeo anti-tormenta que bloqueaba el deploy manual, y variables de Vercel creadas como `Secret`.
+- **Manual de publicación** v1.0 en PDF.
+- **Monetización**: el canal ya califica para el Programa de Socios de YouTube (pide 1,000 suscriptores y 4,000 horas). AdSense en trámite.
 
-## Estado (7 de octubre, 2026)
+### 6 de octubre de 2026: dominio propio
 
-Primera ronda de pedidos del equipo después de revisar el sitio:
+`tomolapalabra.com` en vivo (GoDaddy → Vercel), sin `www` como dominio canónico, con el pipeline anotando las URLs nuevas en el Registro y Search Console verificado.
 
-1. **Fotos recuperadas.** El equipo insertaba las fotos con ajuste de texto, y el pipeline solo leía las que estaban "en línea": 30 de las 32 notas reales se habían publicado sin imágenes. Ahora se publican todas (la primera es la portada y las demás van en una galería). Se republicaron las 31 notas desde sus Docs de Archivo, conservando su fecha original: 75 fotos recuperadas. Detalle en `CLAUDE.md`.
-2. **Secciones definitivas**: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle y Opinión, con las descripciones del equipo. Las 32 notas se reclasificaron (también en sus Docs, para que una republicación no lo revierta). "Reportaje" desapareció; su URL redirige a Profundidad.
-3. **Autor**: encabezado `Autor` en el Doc; por defecto, "Redacción Tomo la Palabra".
-4. **Nota destacada**: encabezado `Destacada` (sí/no) en el Doc.
-5. **Opinión y nota general**: plantillas de Google Doc en la raíz de Drive (la de nota general habilita notas sin entrevista, que antes estaban fuera del alcance) y vista propia de Opinión en el sitio.
-6. **Se quitaron las 3 notas de ejemplo del andamiaje** (Caso IGSS-Pisa, zona 7, Shai Wa). IGSS-Pisa, con texto de relleno, era la nota principal fija de la portada en vivo.
-7. **Titular cambiado = nota duplicada** (corregido): republicar con otro Titular creaba una URL nueva y dejaba la vieja. Ahora reemplaza la nota y redirige.
+### 7 y 8 de octubre de 2026: primera ronda de pedidos del equipo
+
+- **Fotos recuperadas.** El equipo insertaba las fotos con ajuste de texto y el pipeline solo leía las que estaban "en línea": 30 de 32 notas se habían publicado sin imágenes. Se republicaron desde sus Docs y se recuperaron 75 fotos. Ahora la primera es la portada y las demás se reparten en el texto, una cada tres párrafos.
+- **Secciones definitivas** y reclasificación de las 32 notas, también en sus Docs. "Reportaje" desapareció; su URL redirige a Profundidad.
+- **Encabezados nuevos en el Doc**: `Autor`, `Destacada`, `Sobre el autor` (Opinión) y `Videos cortos`.
+- **Plantillas de Nota general y Opinión**. La de nota general habilita notas sin entrevista, que hasta ahora estaban fuera del alcance.
+- **Se quitaron las 3 notas de ejemplo** del andamiaje inicial. Una de ellas, con texto de relleno, era la nota principal fija de la portada en vivo.
+- **Bugs corregidos**: republicar con otro titular duplicaba la nota; la fecha salía en UTC (un día después de noche) y se mostraba un día antes; el deploy posterior a Publish tomaba el commit anterior a la nota, que salía en vivo con 15 a 30 minutos de atraso.
+- **Guía web de uso** para el equipo y manual en PDF actualizado a la v1.1.
 
 ## Decisiones ya tomadas
 
-- Video embebido de YouTube (no autohospedado).
-- Contenido versionado como `.mdx` en el propio repo (git-as-CMS), no headless CMS externo.
-- Solo AdSense en v1, con `<AdSlot>` diseñado para poder enchufar anuncios locales después sin rediseño.
-- Despliegue orquestado desde GitHub Actions (no el auto-deploy nativo de Vercel), pensando en una posible migración a AWS más adelante.
-- Reutilizar las keys de Deepgram y Anthropic que Moncho ya tenía en otros proyectos personales (no son credenciales de cliente).
+- Video embebido de YouTube, no autohospedado. Los videos cortos usan el reproductor oficial de cada red.
+- Contenido versionado como `.mdx` en el propio repo (git como CMS), sin CMS ni base de datos externa. Google Drive es la interfaz editorial.
+- Solo AdSense en v1, con `<AdSlot>` diseñado para enchufar anuncios locales después sin rediseño.
+- Despliegue orquestado desde GitHub Actions, no el auto-deploy de Vercel, pensando en una posible migración a AWS.
+- Keys de Deepgram y Anthropic reutilizadas de otros proyectos personales de Moncho (no son credenciales de cliente).
+- Las reglas de presentación (fotos cada tres párrafos, videos cortos al final) se aplican al mostrar la página, no al publicar: cambiarlas no requiere republicar notas.
 
 ## Preguntas abiertas para el equipo de TLP
 
-(Estas están también en la presentación — llevarlas a esa conversación, no resolverlas unilateralmente):
+1. **Volumen esperado**: ¿cuántas notas por semana o mes? Define el costo variable real (~$0.55 por entrevista en Deepgram y Claude) y si conviene ajustar la frecuencia de los cron.
+2. **Convenciones de tags**: no hay lista controlada; las etiquetas se multiplican cuando una nota usa `agua` y otra `el-agua`.
+3. **Texto alternativo y portadas**: hoy ninguna foto trae texto alternativo, y muchas portadas son capturas verticales de Reels con texto encima, que pierden dos tercios al recortarse. Es práctica editorial, no código; está en la guía y el manual.
+4. **Monitoreo de fuentes estatales para investigaciones**: sigue fuera del alcance de este flujo, hasta que el equipo tenga claridad de proceso.
 
-1. **Nota destacada** — resuelto el 2026-10-07 con el encabezado `Destacada` en el Doc.
-2. **Volumen esperado**: ¿cuántas entrevistas por semana/mes? Define el costo variable real (~$0.55/entrevista en Deepgram+Claude) y si conviene ajustar la frecuencia de los cron jobs.
-3. **Fotografías** — resuelto el 2026-10-07: se publican todas las fotos del Doc. Pendiente del lado editorial: portadas horizontales y texto alternativo en cada foto (hoy ninguna lo trae).
-4. **Taxonomía final** — resuelto el 2026-10-07 (ver Estado). Siguen abiertas las convenciones de tags.
-5. **Notas tradicionales sin entrevista + monitoreo de fuentes estatales para investigaciones**: explícitamente fuera del alcance de este flujo por ahora. Se revisará aparte cuando el equipo tenga claridad de proceso.
+## Pendientes
 
-## Pendientes técnicos conocidos
+### Para verificar pronto
 
-- **Corrección sin publicar en "La Canche y El Chaiwa"**: el Doc de Archivo tiene el titular corregido ("El Shaiwa"), pero nunca se republicó. Al arrastrarlo a Publicar, la nota cambia de URL y la vieja redirige.
+- **Primera nota desde plantilla publicada por alguien del equipo.** Las copias de plantilla quedan a nombre de cada persona, no de la cuenta de Moncho. La service account debería poder moverlas igual (ya mueve Docs que no son suyos), pero no se probó con una cuenta del equipo.
+- **"La Canche y El Chaiwa"**: el Doc de Archivo tiene el titular corregido ("El Shaiwa") sin republicar. Al moverlo a Publicar, la nota cambia de URL y la vieja redirige.
 
-- **Canonical explícito**: el sitio no emite `<link rel="canonical">` (solo hay `metadataBase` en `app/layout.tsx`). Hoy no urge porque los redirects 308 evitan contenido duplicado, pero conviene declararlo con `alternates.canonical` en la metadata de cada página, sobre todo en las notas.
-- **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia — el sitio usa sustitutos de Google Fonts (ver nota en `app/layout.tsx`). Conseguir las fuentes reales de Voice Agency (la agencia que hizo el brandbook).
-- **Migrar el flujo de Drive a la cuenta institucional (YoTomoLaPalabra)**: hoy las carpetas del pipeline viven en el Drive personal de Moncho y las credenciales de Google son de esa cuenta. Al migrar hay que: mover las cuatro carpetas + el Sheet del Registro, re-compartirlas con la service account, **generar credenciales nuevas y revocar las actuales** (JSON de la service account y `GOOGLE_OAUTH_REFRESH_TOKEN`, este último con `npm run pipeline:google-oauth-setup` logueado en la cuenta nueva), y actualizar los IDs y secretos en `.env.local` y GitHub Secrets. Ojo: la cuenta institucional también es Gmail personal, así que la limitación de cuota de storage de las service accounts (ver `CLAUDE.md`) **sigue aplicando** — la migración no la resuelve.
-- **Paginación de `/videos`**: hoy muestra hasta 50 videos, que es el tope de una página de la API de YouTube. Cuando el canal pase de 50 habrá que paginar con `pageToken` (`lib/youtube.ts`).
-- **Monetización de YouTube**: falta solo el trámite — verificación en 2 pasos en la cuenta del canal, acceso a funciones avanzadas, cuenta de AdSense vinculada, y postular en Studio → Ganar dinero. La revisión de Google tarda ~1 mes. Nota editorial: por los temas que cubre el medio (corrupción, agua, derechos LGBTIQ, política), es probable que varios videos queden con "anuncios limitados" por las políticas de idoneidad para anunciantes — las membresías del canal y Súper Gracias probablemente rindan más que los anuncios.
-- **AdSense**: registrar en Guatemala. El país de una cuenta de AdSense **no se puede cambiar nunca** (habría que cerrarla y abrir otra), y conviene que quede a nombre de la organización y no de una persona, porque la misma cuenta va a recibir después los ingresos del sitio. La verificación de dirección se hace con un PIN por correo postal al llegar a $10 — usar una dirección donde llegue correspondencia de verdad.
-- **Vercel Pro**: el sitio corre en el plan Hobby (gratis). Los términos de Vercel restringen Hobby a uso no comercial — como el sitio va a llevar AdSense, hay que pasar a Pro (~$20/mes) antes de anunciarlo públicamente.
-- **Ledger de correcciones**: cuando se re-publica una nota editada (mover el Doc de Archivo de vuelta a Publicar), el Registro de Publicaciones agrega una fila nueva en vez de marcar la original como "editada". Funciona, pero podría afinarse.
-- **Auditoría de accesibilidad**: la pasada de código ya está hecha; falta una prueba real con un lector de pantalla (VoiceOver/NVDA) antes de considerarlo cerrado del todo.
-- **Resuelto (2026-09-07)**: la sección `/videos` ya está conectada al canal (`UC3bxUswJgceF-gA7GEXAV2w`). `YOUTUBE_API_KEY` y `YOUTUBE_CHANNEL_ID` viven en Vercel (Production) y en `.env.local`; no van en GitHub Secrets porque `deploy.yml` las obtiene vía `vercel pull`. La lista se refresca sola cada 30 min (ISR), sin deploy.
-- **Incidente resuelto (2026-09-23)**: `Transcribe` falló todo el día por dos causas encadenadas. (1) Se renombraron videos en Entrevistas quitándoles el `.mp4`, y el pipeline armaba la ruta del audio a partir de la extensión del título, así que ffmpeg fallaba y el primer video bloqueaba a todos los demás; ahora los temporales se nombran por ID de Drive y cada video falla por separado. (2) Detrás de eso, el refresh token de OAuth había vencido porque la app estaba en modo "Testing" (vence a los 7 días); se pasó a producción, con la página `/privacidad` que Google exige, y se regeneró el token. Se recuperaron los 6 borradores pendientes. Detalle técnico en `CLAUDE.md`.
-- **Incidente resuelto (2026-08-09)**: `Deploy` fallaba en cada corrida (`Too many requests... api-upload-free`) porque redesplegaba el mismo commit ~70-95 veces al día — el cron de `Publish` (cada 15 min) disparaba `Deploy` vía `workflow_run` aunque no hubiera nada nuevo publicado. Se agregó un chequeo en `deploy.yml` que compara el commit actual contra el último deploy de producción en Vercel y omite el build/deploy si son iguales (detalle técnico en `CLAUDE.md`). La cuota gratuita debería recuperarse ~24h después del incidente; no hace falta pasar a Vercel Pro por esto.
+### Antes de anunciar el sitio con publicidad
 
-## Convenciones de trabajo con Moncho (para la próxima sesión)
+- **Vercel Pro** (~$20/mes): el plan Hobby no permite uso comercial, y el sitio va a llevar AdSense.
+- **Aviso de cookies y política de privacidad del sitio.** `/privacidad` describe solo la herramienta interna (la exige Google para la app de OAuth). Con AdSense hará falta consentimiento, y los reproductores de Instagram y TikTok ya dejan cookies de Meta y TikTok cuando cargan.
+- **AdSense**: registrar en Guatemala y a nombre de la organización. El país de una cuenta no se puede cambiar nunca, y la verificación de dirección llega por correo postal con un PIN al llegar a $10.
+- **Monetización de YouTube**: falta el trámite (verificación en 2 pasos, funciones avanzadas, AdSense vinculado, postular en Studio). Por los temas del medio, es probable que varios videos queden con "anuncios limitados"; las membresías y Súper Gracias pueden rendir más.
 
-- Cuando algo requiere un secreto (API key, token), nunca pedírselo directo en el chat — darle el comando exacto para que él lo corra y lo guarde en `.env.local` / GitHub Secrets. Ha habido varios traspiés de copiado (keys truncadas, `$` de más, `.env.local` sin salto de línea final pegando variables entre sí) — verificar siempre longitud/formato antes de asumir que quedó bien, sin leer el valor real.
-- Moncho prefiere que se implemente directamente en vez de solo discutir opciones, cuando el pedido ya es concreto (ej. "el menú debería ser hamburguesa").
-- **Nunca cargar `.env.local` con `source`/`.` en la shell.** El archivo tiene el JSON de la service account con saltos de línea reales; zsh intenta ejecutar su contenido y vuelca los secretos en los mensajes de error. Para usar una variable en un comando, extraer solo esa línea (`grep -m1 '^NOMBRE=' .env.local | sed 's/^NOMBRE=//'`) y no imprimirla nunca.
-- Este repo es público — cualquier cosa que se documente en `CLAUDE.md`/`PROJECT.md` o se comitee queda visible. Mantener información sensible (de terceros, del equipo de TLP) fuera o genérica.
+### Técnicos
+
+- **Migrar el flujo a la cuenta institucional (YoTomoLaPalabra)**: mover las cuatro carpetas, las plantillas y el Registro; re-compartir con la service account; **generar credenciales nuevas y revocar las actuales** (JSON de la service account y `GOOGLE_OAUTH_REFRESH_TOKEN`); actualizar IDs y secretos en `.env.local` y GitHub Secrets; recrear las plantillas con `npm run pipeline:create-template`; y actualizar los enlaces de la guía web. La cuenta institucional también es Gmail personal, así que la limitación de cuota de las service accounts sigue aplicando.
+- **Canonical en portada, secciones y etiquetas**: las notas ya lo emiten; las demás páginas no. No urge porque los redirects 308 evitan duplicados.
+- **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia; el sitio usa sustitutos de Google Fonts. Pedirlas a Voice Agency, la agencia del brandbook.
+- **Paginación de `/videos`**: muestra hasta 50 videos, el tope de una página de la API de YouTube.
+- **Registro de correcciones**: republicar una nota agrega una fila nueva en el Registro en vez de marcar la original como editada.
+- **Auditoría con lector de pantalla**: la pasada de código está hecha; falta probar con VoiceOver o NVDA, idealmente con las personas del equipo que lo usan.
+
+## Incidentes resueltos
+
+- **2026-10-07, notas sin fotos**: ver Historial. Causa técnica en `CLAUDE.md` ("fotos flotantes").
+- **2026-09-23, `Transcribe` caído todo el día**: (1) videos renombrados sin `.mp4` rompían ffmpeg y el primero bloqueaba a los demás; ahora los temporales se nombran por ID de Drive y cada video falla por separado. (2) El refresh token de OAuth había vencido porque la app estaba en modo Testing; se pasó a producción con la página `/privacidad`. Se recuperaron 6 borradores.
+- **2026-08-09, `Deploy` sin cuota**: el cron de Publish disparaba un deploy real cada 15 minutos aunque no hubiera cambios, y agotó la cuota gratuita de Vercel. `deploy.yml` ahora omite el deploy si el commit ya está en producción.
+
+## Convenciones de trabajo con Moncho
+
+- Cuando algo requiere un secreto, nunca pedírselo en el chat: darle el comando exacto para que lo corra y lo guarde en `.env.local` o GitHub Secrets. Ha habido traspiés de copiado (keys truncadas, `$` de más, `.env.local` sin salto de línea final); verificar longitud y formato sin leer el valor.
+- **Nunca cargar `.env.local` con `source` o `.`**: tiene el JSON de la service account con saltos de línea reales, y zsh vuelca los secretos en los mensajes de error. Para usar una variable, extraer solo esa línea (`grep -m1 '^NOMBRE=' .env.local | sed 's/^NOMBRE=//'`) sin imprimirla.
+- Moncho prefiere que se implemente directamente cuando el pedido ya es concreto. Las decisiones editoriales (secciones, reclasificar notas, quitar contenido publicado) se le consultan antes.
+- Este repo es público: lo que se documente aquí o se comitee queda visible. Mantener fuera la información sensible de terceros y del equipo de TLP.
+- Los textos para el equipo (manual, guía, plantillas) van en español con voseo, como habla el equipo.
