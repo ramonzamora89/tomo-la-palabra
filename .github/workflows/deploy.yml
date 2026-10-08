@@ -80,4 +80,8 @@ jobs:
         run: |
           npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           npx vercel build --prod --token="$VERCEL_TOKEN"
-          npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          # --archive=tgz sube el build como un solo archivo. Sin esto, cada
+          # archivo de .vercel/output cuenta contra el límite de 5000 subidas
+          # diarias del plan gratuito (api-upload-free), que se agotó con
+          # unos pocos deploys el 2026-08-09 y otra vez el 2026-10-08.
+          npx vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"

@@ -109,12 +109,28 @@ async function main() {
 
   const list = await drive.files.list({
     q: `'${config.driveFolders.entrevistas}' in parents and trashed = false`,
-    fields: "files(id, name, size, appProperties)",
+    fields: "files(id, name, size, mimeType, appProperties)",
   });
 
-  const videos = (list.data.files ?? []).filter(
+  const pending = (list.data.files ?? []).filter(
     (f) => f.appProperties?.[STATUS_PROPERTY] !== STATUS_TRANSCRIBED,
   );
+
+  // The team sometimes drops PDFs, Docs or images into Entrevistas by
+  // mistake. Skip them with a warning instead of failing every run on
+  // ffmpeg. octet-stream stays in: a renamed video without extension can
+  // come back with that type.
+  const videos = pending.filter((f) => {
+    const type = f.mimeType ?? "";
+    const isMedia =
+      type.startsWith("video/") ||
+      type.startsWith("audio/") ||
+      type === "application/octet-stream";
+    if (!isMedia) {
+      console.warn(`Saltando "${f.name}": no es un video (${type}).`);
+    }
+    return isMedia;
+  });
 
   if (videos.length === 0) {
     console.log("No hay videos nuevos en Entrevistas.");
