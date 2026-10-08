@@ -12,7 +12,7 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 - **Repo**: https://github.com/ramonzamora89/tomo-la-palabra (público)
 - **Carpeta raíz de Drive**: `11ej-EutGTMwqnKXVi99jBdbtdgewRfOM`, en la cuenta personal de Moncho y compartida como Editor con la service account `ramon@labetnografico.com`. Contiene las cuatro carpetas del flujo y las dos plantillas.
 - **Guía de uso del sistema** (web, para el equipo): https://claude.ai/artifact/K7WnY5mBj9XmxyF3k8pZb2. Es privada: se comparte desde su menú Compartir.
-- **Manual de publicación** (PDF, 12 páginas, v1.1 del 8 de octubre de 2026): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`. No está en git.
+- **Manual de publicación** (PDF, 12 páginas, v1.2 del 8 de octubre de 2026): `manual-editorial/manual-publicacion-tomo-la-palabra.pdf`. No está en git.
 - **Presentación del flujo**: `presentacion-flujo/propuesta.pdf` y `.pptx`. No está en git.
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` (1,409 suscriptores y 15.1 K horas de reproducción al 7 de septiembre de 2026).
 
@@ -49,7 +49,7 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 - **Plantillas de Nota general y Opinión**. La de nota general habilita notas sin entrevista, que hasta ahora estaban fuera del alcance.
 - **Se quitaron las 3 notas de ejemplo** del andamiaje inicial. Una de ellas, con texto de relleno, era la nota principal fija de la portada en vivo.
 - **Bugs corregidos**: republicar con otro titular duplicaba la nota; la fecha salía en UTC (un día después de noche) y se mostraba un día antes; el deploy posterior a Publish tomaba el commit anterior a la nota, que salía en vivo con 15 a 30 minutos de atraso.
-- **Guía web de uso** para el equipo y manual en PDF actualizado a la v1.1.
+- **Guía web de uso** para el equipo y manual en PDF actualizado a la v1.2, con las dos plantillas.
 
 ## Decisiones ya tomadas
 
