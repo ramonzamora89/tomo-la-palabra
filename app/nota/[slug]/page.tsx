@@ -9,7 +9,8 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { AdSlot } from "@/components/AdSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { TranscriptToggle } from "@/components/TranscriptToggle";
-import { Galeria } from "@/components/Galeria";
+import { Foto, Galeria } from "@/components/Galeria";
+import { intercalarFotos } from "@/lib/intercalarFotos";
 import {
   absoluteUrl,
   breadcrumbJsonLd,
@@ -75,6 +76,7 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
   // The paper texture is the "no photo" placeholder — fine on a card, but
   // an empty textured box at the top of the note itself reads as a bug.
   const hasCover = nota.coverImage !== "/images/paper-texture.svg";
+  const { content, usadas } = intercalarFotos(nota.content, nota.images.length);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
@@ -129,8 +131,12 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
 
       <div className="prose prose-lg mt-8 max-w-none prose-headings:font-display prose-headings:text-brand-verde prose-blockquote:font-hand prose-blockquote:text-2xl prose-blockquote:not-italic prose-blockquote:text-brand-verde prose-blockquote:border-brand-amarillo">
         <MDXRemote
-          source={nota.content}
-          components={{ TranscriptToggle, Galeria: () => <Galeria images={nota.images} /> }}
+          source={content}
+          components={{
+            TranscriptToggle,
+            Foto: ({ n }: { n: string }) => <Foto img={nota.images[Number(n)]} />,
+            Galeria: () => <Galeria images={nota.images.slice(usadas)} />,
+          }}
         />
       </div>
 
