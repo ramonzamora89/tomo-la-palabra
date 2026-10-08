@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import type { drive_v3, docs_v1, sheets_v4 } from "googleapis";
 import { config } from "./lib/config";
@@ -5,10 +6,11 @@ import { getGoogleClients } from "./lib/googleClients";
 import { parseDocSections } from "./lib/parseDoc";
 import { downloadDocImages } from "./lib/downloadImages";
 import { generateMdxFile } from "./lib/generateMdx";
-import { slugify } from "./lib/slug";
+import { slugify, todayInGuatemala } from "./lib/slug";
 import { commitAndPush } from "./lib/gitCommit";
 import { moveDocToArchivo } from "./lib/moveToArchivo";
 import { ensureLedgerHeader, appendLedgerRow } from "./lib/updateLedger";
+import { findPreviousSlug, retireOldSlug } from "./lib/renamedNota";
 
 const REPO_ROOT = process.cwd();
 const DEFAULT_AUTHOR = "Redacción Tomo la Palabra";
@@ -36,20 +38,37 @@ async function processDoc(
   }
 
   const slug = slugify(sections.titular);
-  const imagesDir = path.join(REPO_ROOT, "public", "images", "notas", slug);
-  const { coverImage, coverImageAlt } = await downloadDocImages(document, imagesDir);
+  const author = sections.autor?.trim() || DEFAULT_AUTHOR;
 
+  // Re-publishing replaces the note's images wholesale: a photo removed
+  // from the Doc must disappear from the site too, not linger as image-N.
+  const imagesDir = path.join(REPO_ROOT, "public", "images", "notas", slug);
+  const hadImages = fs.existsSync(imagesDir);
+  fs.rmSync(imagesDir, { recursive: true, force: true });
+  const images = await downloadDocImages(document, imagesDir);
+  console.log(`  ${images.length} imagen(es) encontradas en el Doc.`);
+
+  const previousSlug = findPreviousSlug(REPO_ROOT, documentId, slug);
   const { filePath } = generateMdxFile({
     sections,
     slug,
-    author: DEFAULT_AUTHOR,
-    coverImageFileName: coverImage,
-    coverImageAlt,
+    author,
+    images,
     repoRoot: REPO_ROOT,
+    documentId,
+    previousFilePath: previousSlug
+      ? path.join(REPO_ROOT, "content", "notas", `${previousSlug}.mdx`)
+      : undefined,
   });
 
+  // `git add <dir>` also stages deletions inside it — but fails if the
+  // path never existed, so only add it when there's something to record.
   const filesToCommit = [filePath];
-  if (coverImage) filesToCommit.push(path.join(imagesDir, coverImage));
+  if (hadImages || images.length > 0) filesToCommit.push(imagesDir);
+  if (previousSlug) {
+    console.log(`  El Titular cambió: /nota/${previousSlug} redirige ahora a /nota/${slug}.`);
+    filesToCommit.push(...retireOldSlug(REPO_ROOT, previousSlug, slug));
+  }
 
   await commitAndPush({
     repoRoot: REPO_ROOT,
@@ -62,9 +81,9 @@ async function processDoc(
 
   await ensureLedgerHeader(sheets);
   await appendLedgerRow(sheets, {
-    fecha: new Date().toISOString().slice(0, 10),
+    fecha: todayInGuatemala(),
     titulo: sections.titular,
-    autor: DEFAULT_AUTHOR,
+    autor: author,
     linkDoc: `https://docs.google.com/document/d/${documentId}/edit`,
     linkYoutube: sections.youtubeUrl ?? "",
     urlPublicada: `${SITE_URL}/nota/${slug}`,

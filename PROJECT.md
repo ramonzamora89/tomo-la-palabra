@@ -36,6 +36,18 @@ Sesión dedicada a conectar el dominio propio:
 3. **El pipeline anota las URLs nuevas.** `NEXT_PUBLIC_SITE_URL` ahora es `https://tomolapalabra.com` en `publish.yml` y `watchPublicar.ts`. Las filas anteriores del Registro conservan `vercel.app`, que funciona por el redirect.
 4. **Google Search Console**: propiedad de dominio verificada por TXT, sitemap enviado y leído sin errores (263 páginas descubiertas), e indexación de la portada solicitada a mano. Los resultados de búsqueda deberían empezar a aparecer en días, y los informes completos en una o dos semanas.
 
+## Estado (7 de octubre, 2026)
+
+Primera ronda de pedidos del equipo después de revisar el sitio:
+
+1. **Fotos recuperadas.** El equipo insertaba las fotos con ajuste de texto, y el pipeline solo leía las que estaban "en línea": 30 de las 32 notas reales se habían publicado sin imágenes. Ahora se publican todas (la primera es la portada y las demás van en una galería). Se republicaron las 31 notas desde sus Docs de Archivo, conservando su fecha original: 75 fotos recuperadas. Detalle en `CLAUDE.md`.
+2. **Secciones definitivas**: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle y Opinión, con las descripciones del equipo. Las 32 notas se reclasificaron (también en sus Docs, para que una republicación no lo revierta). "Reportaje" desapareció; su URL redirige a Profundidad.
+3. **Autor**: encabezado `Autor` en el Doc; por defecto, "Redacción Tomo la Palabra".
+4. **Nota destacada**: encabezado `Destacada` (sí/no) en el Doc.
+5. **Opinión**: plantilla de Google Doc en la raíz de Drive y vista propia en el sitio.
+6. **Se quitaron las 3 notas de ejemplo del andamiaje** (Caso IGSS-Pisa, zona 7, Shai Wa). IGSS-Pisa, con texto de relleno, era la nota principal fija de la portada en vivo.
+7. **Titular cambiado = nota duplicada** (corregido): republicar con otro Titular creaba una URL nueva y dejaba la vieja. Ahora reemplaza la nota y redirige.
+
 ## Decisiones ya tomadas
 
 - Video embebido de YouTube (no autohospedado).
@@ -48,13 +60,16 @@ Sesión dedicada a conectar el dominio propio:
 
 (Estas están también en la presentación — llevarlas a esa conversación, no resolverlas unilateralmente):
 
-1. **Nota destacada**: hoy la portada muestra automáticamente la última nota publicada como principal, no necesariamente la que el equipo editorial elegiría. El esquema de contenido ya reserva un campo `featured?: boolean` (`lib/schema.ts`) para resolver esto — falta decidir cómo se marca desde el Doc (¿un campo "Destacada"?) y conectarlo.
+1. **Nota destacada** — resuelto el 2026-10-07 con el encabezado `Destacada` en el Doc.
 2. **Volumen esperado**: ¿cuántas entrevistas por semana/mes? Define el costo variable real (~$0.55/entrevista en Deepgram+Claude) y si conviene ajustar la frecuencia de los cron jobs.
-3. **Fotografías**: hoy el sistema toma la primera imagen insertada en el Doc como portada única. Las demás imágenes del Doc se descargan pero **no se publican ni se commitean** (`watchPublicar.ts` solo incluye la portada en `filesToCommit`) — o sea que hoy se pierden en silencio. ¿Alcanza con la portada, o necesitan fotos dentro del cuerpo? Si la respuesta es que sí, hay trabajo real: commitear las demás y referenciarlas desde el MDX.
-4. **Taxonomía final**: la lista de secciones (`content/taxonomy/categorias.ts`) es provisional (Reportaje, Comunidad, Opinión) — falta la decisión editorial definitiva de secciones y convenciones de tags.
+3. **Fotografías** — resuelto el 2026-10-07: se publican todas las fotos del Doc. Pendiente del lado editorial: portadas horizontales y texto alternativo en cada foto (hoy ninguna lo trae).
+4. **Taxonomía final** — resuelto el 2026-10-07 (ver Estado). Siguen abiertas las convenciones de tags.
 5. **Notas tradicionales sin entrevista + monitoreo de fuentes estatales para investigaciones**: explícitamente fuera del alcance de este flujo por ahora. Se revisará aparte cuando el equipo tenga claridad de proceso.
 
 ## Pendientes técnicos conocidos
+
+- **Corrección sin publicar en "La Canche y El Chaiwa"**: el Doc de Archivo tiene el titular corregido ("El Shaiwa"), pero nunca se republicó. Al arrastrarlo a Publicar, la nota cambia de URL y la vieja redirige.
+- **Manual editorial**: desactualizado desde el 2026-10-07 (fotos, autor, destacada, secciones, Opinión). Regenerarlo.
 
 - **Canonical explícito**: el sitio no emite `<link rel="canonical">` (solo hay `metadataBase` en `app/layout.tsx`). Hoy no urge porque los redirects 308 evitan contenido duplicado, pero conviene declararlo con `alternates.canonical` en la metadata de cada página, sobre todo en las notas.
 - **Fuentes de marca reales**: Chantal y Dreamwalker no existen como archivos con licencia — el sitio usa sustitutos de Google Fonts (ver nota en `app/layout.tsx`). Conseguir las fuentes reales de Voice Agency (la agencia que hizo el brandbook).

@@ -2,6 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { config } from "./lib/config";
 import { categorias } from "../../content/taxonomy/categorias";
 
+// Opinión is written by columnists, never drafted from an interview.
+const seccionesDesdeEntrevista = categorias.filter((c) => c.desdeEntrevista);
+
 const client = new Anthropic({ apiKey: config.anthropicApiKey });
 
 const SYSTEM_PROMPT = `Eres redactor(a) editorial de Tomo la Palabra, un medio guatemalteco que da voz a la gente común a través de entrevistas en video largas. Tu tono es directo e irreverente, fiel a la voz de la marca ("Prohibido dejar de pensar", "Dilo sin tabús y sin pelos en la lengua", "Guate habla"), pero nunca sacrificas la precisión: no inventas hechos, cifras, nombres ni citas que no estén explícitamente en la transcripción que se te entrega. Si algo no queda claro en la transcripción, no lo afirmes.
@@ -17,8 +20,10 @@ const draftSchema = {
     },
     seccion: {
       type: "string",
-      enum: categorias.map((c) => c.slug),
-      description: "La sección del sitio a la que pertenece esta nota.",
+      enum: seccionesDesdeEntrevista.map((c) => c.slug),
+      description:
+        "La sección del sitio a la que pertenece esta nota, según estas definiciones del equipo editorial:\n" +
+        seccionesDesdeEntrevista.map((c) => `- ${c.slug} (${c.nombre}): ${c.descripcion}`).join("\n"),
     },
     entradilla: {
       type: "string",

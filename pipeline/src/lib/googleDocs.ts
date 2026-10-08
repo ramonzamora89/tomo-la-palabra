@@ -1,5 +1,6 @@
 import type { docs_v1 } from "googleapis";
 import type { DraftArticle } from "../draftArticle";
+import { getCategoria } from "../../../content/taxonomy/categorias";
 
 /**
  * Exact heading order the drafting step produces and parseDoc.ts (M9)
@@ -12,7 +13,14 @@ export function buildDraftDocRequests(
 ): docs_v1.Schema$Request[] {
   const sections: { heading: string; body: string }[] = [
     { heading: "Titular", body: draft.titular },
-    { heading: "Sección", body: draft.seccion },
+    // Display name ("La Calle") reads better for editors than the slug;
+    // generateMdx.ts resolves either form back to the slug.
+    { heading: "Sección", body: getCategoria(draft.seccion)?.nombre ?? draft.seccion },
+    // Editors overwrite this with the real byline; left as is, it's the
+    // same default watchPublicar.ts uses when the heading is missing.
+    { heading: "Autor", body: "Redacción Tomo la Palabra" },
+    // "sí" makes it the homepage's main story (the newest one marked wins).
+    { heading: "Destacada", body: "no" },
     { heading: "Entradilla", body: draft.entradilla },
     { heading: "Cuerpo", body: draft.cuerpo },
     { heading: "Imágenes", body: draft.imagenesNotas },

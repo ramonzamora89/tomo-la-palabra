@@ -39,6 +39,12 @@ export function getAllTags(): string[] {
   return Array.from(tags).sort();
 }
 
+/**
+ * Homepage main story: the newest note marked "Destacada: sí" in its Doc
+ * (notas are sorted newest first), or simply the newest note when none is.
+ * A pinned note stays there until a newer one is marked, or it's
+ * re-published with "Destacada: no".
+ */
 export function getFeaturedNota(): Nota | undefined {
   const notas = getAllNotas();
   return notas.find((n) => n.featured) ?? notas[0];

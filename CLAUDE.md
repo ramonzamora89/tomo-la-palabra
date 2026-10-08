@@ -25,6 +25,7 @@ npm run pipeline:draft-local -- "ruta/al/archivo.transcripcion.txt"  # solo reda
 npm run pipeline:watch-entrevistas   # flujo real: Entrevistas → Borradores (Drive)
 npm run pipeline:watch-publicar      # flujo real: Publicar → nota en el repo → Archivo
 npm run pipeline:google-oauth-setup  # una sola vez: genera GOOGLE_OAUTH_REFRESH_TOKEN
+npm run pipeline:create-opinion-template -- <folderId>  # recrea la plantilla de Opinión (p. ej. al migrar de cuenta)
 ```
 
 `PUBLISH_BRANCH=nombre-rama npm run pipeline:watch-publicar` empuja a una rama de prueba en vez de a `main` — útil para probar sin tocar el sitio en vivo.
@@ -41,9 +42,22 @@ Carpetas de Drive (dentro de la raíz del proyecto, compartida con la service ac
 | Archivo | `1XBGv8OdyeOK4YGWUNuhKXCis__5HcJ9v` | Doc publicado, respaldo permanente |
 | Registro de Publicaciones (Sheet) | `1MHjdYeT6dxqQwMfUrBRRLaW4jVO1TxJr9hJwq7aAmJU` | Ledger: fecha/título/autor/links/estado |
 
-Flujo: `watchEntrevistas.ts` (cron cada 30 min) → Deepgram (nova-3, es-419, diarize) → Claude Opus 5 (salida estructurada) → crea el Doc en Borradores con encabezados `Titular / Sección / Entradilla / Cuerpo / Imágenes / Tags / YouTube URL / Transcripción completa`. Un humano revisa y arrastra el Doc a Publicar. `watchPublicar.ts` (cron cada 15 min) parsea el Doc por esos mismos encabezados exactos, baja imágenes inline, genera el `.mdx`, hace commit/push, mueve el Doc a Archivo y anota la fila en el Registro.
+Flujo: `watchEntrevistas.ts` (cron cada 30 min) → Deepgram (nova-3, es-419, diarize) → Claude Opus 5 (salida estructurada) → crea el Doc en Borradores con encabezados `Titular / Sección / Autor / Destacada / Entradilla / Cuerpo / Imágenes / Tags / YouTube URL / Transcripción completa`. Un humano revisa y arrastra el Doc a Publicar. `watchPublicar.ts` (cron cada 15 min) parsea el Doc por esos encabezados (estilo Título 1/2; todo lo que esté antes del primero se ignora), baja las imágenes, genera el `.mdx`, hace commit/push, mueve el Doc a Archivo y anota la fila en el Registro.
 
-**Reprocesar/editar una nota ya publicada**: editar el Doc en Archivo y volver a arrastrarlo a Publicar — mismo slug, sobreescribe el `.mdx`. Ya probado, funciona.
+Encabezados opcionales (un Doc viejo sin ellos sigue funcionando):
+- **`Autor`** — firma de la nota; vacío o ausente → "Redacción Tomo la Palabra". En JSON-LD, una firma que empieza por "Redacción" se declara como `Organization`, no `Person`.
+- **`Destacada`** — "sí" la fija como nota principal de la portada (`featured: true`). Gana la más reciente marcada; si ninguna, la última publicada. Se desmarca republicando con "no".
+- **`Sobre el autor`** — solo Opinión: bio corta que se muestra bajo la columna.
+
+**Secciones** (`content/taxonomy/categorias.ts`, definidas por el equipo en octubre de 2026): Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle, Opinión. El Doc acepta el nombre ("La Calle") o el slug (`la-calle`). La descripción de cada una se muestra en su página y se le pasa a Claude para que elija sección; Opinión (`desdeEntrevista: false`) queda fuera de esas opciones. `/categoria/reportaje` (sección retirada) redirige a Profundidad.
+
+**Imágenes — el bug de las fotos flotantes.** Google Docs guarda una imagen en `inlineObjects` solo si está "en línea con el texto"; con cualquier ajuste de texto (ajustar, separar, delante/detrás) va a `positionedObjects`, anclada a un párrafo. Hasta octubre de 2026 el pipeline solo leía las primeras, y 30 de 32 notas salieron sin fotos. `downloadImages.ts` ahora recorre ambas en orden de documento, descarta duplicados exactos (hash) y re-codifica todo con `sharp` (rotación EXIF, máx. 1920 px de ancho, JPEG q82). La primera es la portada; las demás van en `images` del frontmatter y se muestran con `<Galeria />` después del cuerpo, sin recorte. Si la nota tiene video, la galería incluye también la portada (el embed la reemplaza en la página). Portada y tarjetas recortan a 16:9.
+
+**Fecha**: `pubDate` usa la fecha de Guatemala (`todayInGuatemala()`); antes era UTC y lo publicado después de las 6 p. m. salía con fecha del día siguiente. Al mostrarla, `formatDate` formatea en UTC porque `"2026-10-07"` se parsea como medianoche UTC.
+
+**Plantilla de Opinión**: Doc "PLANTILLA – Columna de opinión" en la carpeta raíz del proyecto (`1L-AHePlvBAANPLyaUKR9xabce17_zbiE7h2wST9BPds`), sin YouTube URL ni transcripción. El equipo hace una copia, la llena y la arrastra a Publicar. Con Titular vacío el pipeline la salta, así que la plantilla misma nunca se publica. En el sitio, `category: opinion` cambia la firma ("Columna de opinión"), agrega "Sobre …" y el aviso de responsabilidad.
+
+**Reprocesar/editar una nota ya publicada**: editar el Doc en Archivo y volver a arrastrarlo a Publicar. Sobreescribe el `.mdx`, reemplaza sus imágenes (borra las que ya no estén en el Doc), **conserva `pubDate`** y marca `updatedDate`. Cada nota guarda `sourceDocId`: si el Titular cambió (slug nuevo), `renamedNota.ts` borra la nota vieja y agrega una redirección 308 en `content/redirects.json`, que lee `next.config.mjs`. Las cadenas se colapsan (A→B→C queda A→C).
 
 ## Autenticación con Google — el gotcha más importante
 
@@ -88,7 +102,7 @@ Para diagnosticar DNS sin esperar la propagación, se puede preguntar directo a 
 
 Todos los secrets (API keys + credenciales de Google + IDs de Drive, aunque estos últimos no son sensibles) están en GitHub Secrets del repo. Los valores reales solo existen ahí y en `.env.local` de Moncho — nunca en el código.
 
-## El repo vive en un disco exFAT — dos trampas de git
+## El repo vive en un disco exFAT — trampas de git y de build
 
 El proyecto está en `/Volumes/Pikachu`, un volumen exFAT que no guarda permisos Unix ni
 distingue mayúsculas. Eso cambia el comportamiento de git de dos formas que ya causaron
@@ -104,6 +118,12 @@ problemas reales:
   apunte a una carpeta de la raíz debe ir anclada con `/` al inicio** (`/VIDEOS/`,
   `/presentacion-flujo/`, `/manual-editorial/`). Sin el ancla, un patrón coincide a cualquier
   profundidad.
+
+- **`next build` se cuelga en el volumen exFAT** (octubre de 2026): `.next/` quedó con una carpeta
+  fantasma (`.next/server/app/tag`) que `rm -rf` no puede borrar ni `ls` listar, y el build se
+  queda en "Environments: .env.local" sin avanzar. El build de CI no se ve afectado. Para compilar
+  en local, copiar el repo a un disco APFS y enlazar `node_modules`:
+  `git ls-files -co --exclude-standard | rsync -a --files-from=- . /tmp/tlp/ && ln -s "$PWD/node_modules" /tmp/tlp/`.
 
 Si algo funciona en local pero no en producción, `git ls-files <ruta>` y `git check-ignore -v
 <ruta>` son el primer diagnóstico: el build de CI solo ve lo que está en el repo.

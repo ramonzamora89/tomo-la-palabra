@@ -8,6 +8,21 @@ import type { docs_v1 } from "googleapis";
 const HEADING_KEYS: Record<string, string> = {
   titular: "titular",
   seccion: "seccion",
+  // Optional — absent or empty falls back to the newsroom byline. Docs
+  // drafted before this heading existed simply don't have it.
+  autor: "autor",
+  autora: "autor",
+  "autor/a": "autor",
+  "autor(a)": "autor",
+  autoria: "autor",
+  // Opinión only: a one- or two-line bio shown under the column.
+  "sobre el autor": "autorBio",
+  "sobre la autora": "autorBio",
+  "sobre el autor/a": "autorBio",
+  "sobre el autor(a)": "autorBio",
+  // "sí" pins the note as the homepage's main story (see getFeaturedNota).
+  destacada: "destacada",
+  destacado: "destacada",
   entradilla: "entradilla",
   cuerpo: "cuerpo",
   imagenes: "imagenes",

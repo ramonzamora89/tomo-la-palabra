@@ -10,6 +10,11 @@ export function absoluteUrl(pathname: string): string {
 import type { Nota } from "./schema";
 import { getCategoria } from "@/content/taxonomy/categorias";
 
+/** "Redacción", "Redacción Tomo la Palabra"… — the newsroom, not a person. */
+export function isNewsroomByline(author: string): boolean {
+  return /^redacci[oó]n\b/i.test(author.trim());
+}
+
 export function newsArticleJsonLd(nota: Nota) {
   return {
     "@context": "https://schema.org",
@@ -19,7 +24,9 @@ export function newsArticleJsonLd(nota: Nota) {
     image: [absoluteUrl(nota.coverImage)],
     datePublished: nota.pubDate,
     dateModified: nota.updatedDate ?? nota.pubDate,
-    author: { "@type": "Person", name: nota.author },
+    author: isNewsroomByline(nota.author)
+      ? { "@type": "Organization", name: SITE_NAME, url: SITE_URL }
+      : { "@type": "Person", name: nota.author },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,

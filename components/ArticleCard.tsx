@@ -3,8 +3,11 @@ import Link from "next/link";
 import type { Nota } from "@/lib/schema";
 import { CategoryBadge } from "./CategoryBadge";
 
+// pubDate is a bare date ("2026-10-07"), which JS parses as UTC midnight —
+// formatting it in Guatemala time would show the previous day.
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-GT", {
+    timeZone: "UTC",
     day: "numeric",
     month: "long",
     year: "numeric",
