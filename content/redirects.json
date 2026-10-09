@@ -1,10 +1,14 @@
 [
   {
     "source": "/nota/nos-ponen-en-la-cola-vecinos-de-la-zona-7-llevan-meses-madrugando-para-juntar-agua",
-    "destination": "/nota/nos-ponen-al-final-de-la-cola-vecinos-de-la-zona-7-llevan-meses-madrugando-para-juntar-agua"
+    "destination": "/nota/sin-agua-en-la-colonia-landivar-vecinos-de-la-zona-7-madrugan-para-llenar-tambos-y-esperan-pipas-que-nunca-llegaron"
   },
   {
     "source": "/nota/la-canche-y-el-chaiwa-como-un-restaurante-chino-detras-del-palacio-nacional-termino-pintado-con-los-colores-de-la-bandera-lgbtiq",
     "destination": "/nota/la-canche-y-el-shai-wa-como-un-restaurante-chino-detras-del-palacio-nacional-termino-pintado-con-los-colores-de-la-bandera-lgbtiq"
+  },
+  {
+    "source": "/nota/nos-ponen-al-final-de-la-cola-vecinos-de-la-zona-7-llevan-meses-madrugando-para-juntar-agua",
+    "destination": "/nota/sin-agua-en-la-colonia-landivar-vecinos-de-la-zona-7-madrugan-para-llenar-tambos-y-esperan-pipas-que-nunca-llegaron"
   }
 ]
