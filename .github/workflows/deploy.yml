@@ -14,6 +14,12 @@ on:
     types: [completed]
   workflow_dispatch:
 
+# Deploys en fila: si dos corren a la vez, el de un commit más viejo puede
+# terminar último y dejarlo en producción.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'

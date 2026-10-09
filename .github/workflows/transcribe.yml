@@ -7,6 +7,12 @@ on:
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
+# Una sola corrida a la vez: un video largo puede tardar más que el intervalo,
+# y una segunda corrida lo procesaría otra vez (Deepgram y Claude cobran doble).
+concurrency:
+  group: transcribe
+  cancel-in-progress: false
+
 jobs:
   transcribe:
     runs-on: ubuntu-latest

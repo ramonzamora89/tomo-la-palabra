@@ -11,6 +11,12 @@ on:
 permissions:
   contents: write
 
+# Una sola corrida a la vez: dos Publish simultáneos procesarían el mismo Doc
+# y chocarían al hacer push. Las que llegan mientras otra corre esperan.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest

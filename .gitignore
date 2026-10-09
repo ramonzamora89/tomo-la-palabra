@@ -51,3 +51,6 @@ client_secret_*.json
 
 # Local Claude Code session state
 .claude/
+
+# Cloudflare (cron/)
+.wrangler/

@@ -1,0 +1,15 @@
+name = "tomo-la-palabra-reloj"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = false   # sin URL pública: solo corre por el cron
+
+[vars]
+GITHUB_REPO = "ramonzamora89/tomo-la-palabra"
+
+# Un solo cron (el plan gratuito tiene pocos por cuenta): cada 15 min.
+# src/index.js decide en cada tick qué workflows lanzar.
+[triggers]
+crons = ["4,19,34,49 * * * *"]
+
+[observability]
+enabled = true
