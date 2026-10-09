@@ -26,6 +26,7 @@ npm run pipeline:watch-entrevistas   # flujo real: Entrevistas → Borradores (D
 npm run pipeline:watch-publicar      # flujo real: Publicar → nota en el repo → Archivo
 npm run pipeline:google-oauth-setup  # una sola vez: genera GOOGLE_OAUTH_REFRESH_TOKEN
 npm run pipeline:create-template -- <general|opinion> <folderId>  # crea una plantilla de Doc
+cd cron && npx wrangler@4 deploy     # publica el reloj de Cloudflare (conserva el secret)
 ```
 
 `PUBLISH_BRANCH=nombre-rama npm run pipeline:watch-publicar` empuja a una rama de prueba en vez de a `main`, para probar sin tocar el sitio en vivo. Ojo: igual mueve el Doc a Archivo y escribe en el Registro.
@@ -135,8 +136,10 @@ Para diagnosticar sin esperar la propagación: `dig +short tomolapalabra.com A @
 
 ## GitHub Actions
 
-- `transcribe.yml`: cron `*/30 * * * *`, corre `watchEntrevistas`.
-- `publish.yml`: cron `*/15 * * * *`, corre `watchPublicar`. Necesita `permissions: contents: write` y `git config user.name/email`. Se puede disparar a mano con `gh workflow run publish.yml`.
+**El reloj es un Worker de Cloudflare, no el cron de GitHub.** En octubre de 2026 el `schedule` de GitHub corría Publish "cada 15 min" cada 4 a 6 horas. `cron/` es un Worker (`tomo-la-palabra-reloj`, mismo patrón que `Escucha-Social/scheduler`) con un solo cron (`4,19,34,49 * * * *`) que lanza `publish.yml` en cada tick y `transcribe.yml` en los de :04 y :34, por `workflow_dispatch`. El `schedule` de GitHub queda como respaldo; `concurrency` en los tres workflows evita corridas simultáneas (un video procesado dos veces se paga dos veces en Deepgram y Claude). Usa el token fine-grained de GitHub `tomo-la-palabra-worker` (solo este repo, *Actions: Read and write*) guardado como secret `GITHUB_TOKEN` del Worker, que **vence el 2027-10-08**: si deja de haber corridas con evento `workflow_dispatch`, revisar primero eso (los errores salen en Cloudflare → Workers → tomo-la-palabra-reloj → Logs). Publicar cambios del Worker: `cd cron && npx wrangler@4 deploy` (conserva el secret). El plan gratuito tiene pocos crons por cuenta, compartidos con los otros proyectos: desde el 9-oct-2026 los ocupan Escucha-Social (4) y este (1); rastreo-carta quedó sin cron.
+
+- `transcribe.yml`: lo lanza el reloj cada 30 min (respaldo: cron `*/30` de GitHub), corre `watchEntrevistas`.
+- `publish.yml`: lo lanza el reloj cada 15 min (respaldo: cron `*/15` de GitHub), corre `watchPublicar`. Necesita `permissions: contents: write` y `git config user.name/email`. Se puede disparar a mano con `gh workflow run publish.yml`.
 - `deploy.yml`: corre en `push` a main, en `workflow_run` después de `Publish` y a mano.
   - Un push hecho por otro workflow con el `GITHUB_TOKEN` no dispara `on: push` (regla anti-loop de GitHub); por eso escucha `workflow_run`. Hace checkout de la **punta de la rama** (`workflow_run.head_branch`), no de `workflow_run.head_sha`: ese es el commit sobre el que *corrió* Publish, el anterior a la nota. Hasta octubre de 2026 se usaba `head_sha`, y cada nota salía en vivo recién en el siguiente ciclo (15-30 min tarde).
   - **Dedupe**: `Publish` termina en éxito aunque no publique nada, y cada tick disparaba un deploy real (~70-95/día). Eso agotó la cuota gratuita de Vercel el 2026-08-09 (`api-upload-free`). Ahora consulta `GET /v6/deployments?target=production` y omite build/deploy si el `meta.githubCommitSha` del último deploy coincide con `git rev-parse HEAD`. Si Vercel cambia esa respuesta, el chequeo falla abierto y despliega igual. Además, `vercel deploy` usa `--archive=tgz`: sin eso, cada archivo del build cuenta como una subida y unos pocos deploys en un día volvían a agotar el límite (pasó otra vez el 2026-10-08).
