@@ -66,7 +66,7 @@ Carpetas de Drive, dentro de la raíz del proyecto (`11ej-EutGTMwqnKXVi99jBdbtdg
 | PLANTILLA – Nota general (Doc, en la raíz) | `1raiEBZUYPHljitQzt0y_hO5-aOwYjDEV9QOVTqslwrE` | Notas sin entrevista |
 | PLANTILLA – Columna de opinión (Doc, en la raíz) | `1SWsUag2xs5XLQAew7dhiSLVPhBVyRTuH1Y1MQrRaVoE` | Columnas firmadas |
 
-**Flujo.** `watchEntrevistas.ts` (cron cada 30 min; salta con un aviso lo que no sea video o audio) → Deepgram (nova-3, es-419, diarize) → Claude Opus 5 (salida estructurada) → crea el Doc en Borradores. Las notas sin entrevista nacen de una copia de plantilla (el link `…/copy` abre el diálogo de copia). Un humano revisa y mueve el Doc a Publicar. `watchPublicar.ts` (cron cada 15 min) lo parsea, baja imágenes, genera el `.mdx`, hace commit/push, mueve el Doc a Archivo y anota la fila en el Registro. Un Doc con Titular **o Sección** vacíos se salta y queda en Publicar, así que una plantilla nunca se publica por accidente.
+**Flujo.** `watchEntrevistas.ts` (cada 30 min, ver "GitHub Actions"; salta con un aviso lo que no sea video o audio) → Deepgram (nova-3, es-419, diarize) → Claude Opus 5 (salida estructurada) → crea el Doc en Borradores. Las notas sin entrevista nacen de una copia de plantilla (el link `…/copy` abre el diálogo de copia). Un humano revisa y mueve el Doc a Publicar. `watchPublicar.ts` (cada 15 min) lo parsea, baja imágenes, genera el `.mdx`, hace commit/push, mueve el Doc a Archivo y anota la fila en el Registro. Un Doc con Titular **o Sección** vacíos se salta y queda en Publicar, así que una plantilla nunca se publica por accidente.
 
 ### Encabezados del Doc
 
@@ -148,12 +148,13 @@ Para diagnosticar sin esperar la propagación: `dig +short tomolapalabra.com A @
 
 Todos los secrets (API keys, credenciales de Google, IDs de Drive) están en GitHub Secrets. Los valores reales solo existen ahí y en `.env.local` de Moncho, nunca en el código.
 
-## El repo vive en un disco exFAT: tres trampas
+## El repo vive en un disco exFAT: cuatro trampas
 
 El proyecto está en `/Volumes/Pikachu`, un volumen exFAT que no guarda permisos Unix ni distingue mayúsculas:
 
 - **`core.fileMode`**: sin desactivarlo, todos los archivos aparecen modificados (`100644 => 100755`). Ya está `core.fileMode=false` en la config local. Si `git status` muestra todo el repo modificado, es esto.
 - **`core.ignorecase=true`** (autodetectado): los patrones de `.gitignore` dejan de distinguir mayúsculas. La regla `VIDEOS/` capturaba también `app/videos/`, que quedó fuera del repo hasta que `/videos` dio 404 en producción. **Toda regla de `.gitignore` para una carpeta de la raíz va anclada con `/`** (`/VIDEOS/`, `/presentacion-flujo/`, `/manual-editorial/`).
+- **`git pull --rebase` se detiene con "Your local changes … would be overwritten"** aunque `git status` esté limpio: es el caché de timestamps del índice, no hay cambios reales. `git update-index --refresh` y `git rebase --continue`; verificar con `git show --stat HEAD` que el commit quedó entero antes de empujar.
 - **`next build` se cuelga**: `.next/` quedó con una carpeta fantasma (`.next/server/app/tag`) que `rm -rf` no borra ni `ls` lista, y el build se queda en "Environments: .env.local". El build de CI no se ve afectado. Para compilar en local, copiar el repo a un disco APFS y enlazar `node_modules`:
 
 ```bash
