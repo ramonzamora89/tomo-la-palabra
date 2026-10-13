@@ -16,7 +16,7 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 - **Presentación del flujo**: `presentacion-flujo/propuesta.pdf` y `.pptx`. No está en git.
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` (1,409 suscriptores y 15.1 K horas de reproducción al 7 de septiembre de 2026).
 
-## Estado actual (9 de octubre de 2026)
+## Estado actual (13 de octubre de 2026)
 
 El sitio está en producción con dominio propio y 31 notas reales. El flujo editorial funciona solo, en GitHub Actions, con un reloj en Cloudflare que lo lanza a tiempo:
 
@@ -58,6 +58,10 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 - **Se quitó una nota duplicada**: "Nos ponen al final de la cola…" (agosto) era una versión de prueba de "Sin agua en la colonia Landívar…" (octubre), con la misma entrevista. Su URL redirige a la de octubre.
 - El equipo republicó buena parte de las notas desde Archivo, con fotos y titulares corregidos: el flujo de corrección ya está en uso.
 
+### 13 de octubre de 2026: citas con cierre en español
+
+- **El punto va después de la comilla de cierre** (“Hola”.), a pedido del equipo. Las comillas de las citas (`>` en el Doc) las ponía el CSS alrededor de todo el párrafo, con el punto adentro, y salían dobles si quien redactaba ya las había escrito. Ahora las escribe `lib/citas.ts` al mostrar la página: respeta las que ya existen y deja la atribución afuera (“…”, dice la vecina). Aplica a todas las notas sin republicar.
+
 ## Decisiones ya tomadas
 
 - Video embebido de YouTube, no autohospedado. Los videos cortos usan el reproductor oficial de cada red.
@@ -82,6 +86,8 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 
 - **Primera nota desde plantilla publicada por alguien del equipo.** Las copias de plantilla quedan a nombre de cada persona, no de la cuenta de Moncho. La service account debería poder moverlas igual (ya mueve Docs que no son suyos), pero no se probó con una cuenta del equipo.
 - **Doc de prueba de la nota de la zona 7** (creado el 31 de julio, "Nos ponen al final de la cola…"): sigue en Archivo. Si alguien lo mueve a Publicar, la nota reaparece. Mandarlo a la papelera o renombrarlo "PRUEBA – no publicar". Su fila en el Registro también sigue.
+- **Dos citas por corregir en "Sin agua en la colonia Landívar…"** (pedido al equipo el 13-oct): una tiene solo la comilla de cierre ("…cuenta uno de los vecinos") y la de "Se llegó a un convenio de cuatro pipas…" lleva pegado el párrafo siguiente, que el sitio muestra dentro de la cita. Se corrigen en el Doc y se republica desde Archivo.
+- **Citas con atribución**: el sitio la reconoce por una lista de verbos (dice, afirma, cuenta…). Si alguna sale mal, lo más simple es que el equipo escriba las comillas a mano en el Doc.
 - **Cinco PDF de hilos en Entrevistas**: ya no rompen nada (Transcribe los salta con un aviso), pero conviene moverlos a su propia carpeta.
 
 ### Antes de anunciar el sitio con publicidad
