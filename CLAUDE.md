@@ -49,6 +49,7 @@ cd cron && npx wrangler@4 deploy     # publica el reloj de Cloudflare (conserva 
 | `content/redirects.json` | Redirects 308 de notas renombradas (lo escribe el pipeline) |
 | `lib/schema.ts` | Contrato del frontmatter |
 | `lib/intercalarFotos.ts` | Reparte las fotos en el cuerpo al renderizar |
+| `lib/citas.ts` | Comillas de las citas (`>`) con el punto después del cierre: “Hola”. Al renderizar; reemplaza las comillas CSS de `prose` (apagadas en `tailwind.config.ts`) |
 | `lib/videosCortos.ts` | Reconoce links de cada red y arma la URL del reproductor (compartido con el pipeline) |
 | `app/nota/[slug]/page.tsx` | Página de nota: video o portada, cuerpo, fotos, videos cortos, variante Opinión |
 

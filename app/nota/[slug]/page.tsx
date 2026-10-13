@@ -11,6 +11,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { TranscriptToggle } from "@/components/TranscriptToggle";
 import { Foto, Galeria } from "@/components/Galeria";
 import { intercalarFotos } from "@/lib/intercalarFotos";
+import { citasEnEspanol } from "@/lib/citas";
 import { VideosCortos } from "@/components/VideosCortos";
 import {
   absoluteUrl,
@@ -77,7 +78,7 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
   // The paper texture is the "no photo" placeholder — fine on a card, but
   // an empty textured box at the top of the note itself reads as a bug.
   const hasCover = nota.coverImage !== "/images/paper-texture.svg";
-  const fotos = intercalarFotos(nota.content, nota.images.length);
+  const fotos = intercalarFotos(citasEnEspanol(nota.content), nota.images.length);
   // Short videos go at the very end of the note's text, before the
   // transcript (or simply last, when there's no transcript).
   const content = fotos.content.includes("<TranscriptToggle>")

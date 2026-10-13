@@ -38,6 +38,16 @@ const config: Config = {
         hand: ["var(--font-hand)"],
         sans: ["var(--font-body)"],
       },
+      // Quote marks are written into the text by lib/citas.ts (so the
+      // period can go after the closing one), not added by the plugin.
+      typography: {
+        DEFAULT: {
+          css: {
+            "blockquote p:first-of-type::before": { content: "none" },
+            "blockquote p:last-of-type::after": { content: "none" },
+          },
+        },
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
