@@ -16,7 +16,7 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 - **Presentación del flujo**: `presentacion-flujo/propuesta.pdf` y `.pptx`. No está en git.
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` (1,409 suscriptores y 15.1 K horas de reproducción al 7 de septiembre de 2026).
 
-## Estado actual (13 de octubre de 2026)
+## Estado actual (20 de octubre de 2026)
 
 El sitio está en producción con dominio propio y 31 notas reales. El flujo editorial funciona solo, en GitHub Actions, con un reloj en Cloudflare que lo lanza a tiempo:
 
@@ -45,7 +45,7 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 
 - **Fotos recuperadas.** El equipo insertaba las fotos con ajuste de texto y el pipeline solo leía las que estaban "en línea": 30 de 32 notas se habían publicado sin imágenes. Se republicaron desde sus Docs y se recuperaron 75 fotos. Ahora la primera es la portada y las demás se reparten en el texto, una cada tres párrafos.
 - **Secciones definitivas** y reclasificación de las 32 notas, también en sus Docs. "Reportaje" desapareció; su URL redirige a Profundidad.
-- **Encabezados nuevos en el Doc**: `Autor`, `Destacada`, `Sobre el autor` (columnas de Voces) y `Videos cortos`.
+- **Encabezados nuevos en el Doc**: `Autor`, `Destacada`, `Sobre el autor` (Opinión) y `Videos cortos`.
 - **Plantillas de Nota general y Opinión**. La de nota general habilita notas sin entrevista, que hasta ahora estaban fuera del alcance.
 - **Se quitaron las 3 notas de ejemplo** del andamiaje inicial. Una de ellas, con texto de relleno, era la nota principal fija de la portada en vivo.
 - **Bugs corregidos**: republicar con otro titular duplicaba la nota; la fecha salía en UTC (un día después de noche) y se mostraba un día antes; el deploy posterior a Publish tomaba el commit anterior a la nota, que salía en vivo con 15 a 30 minutos de atraso.
@@ -61,6 +61,12 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 ### 13 de octubre de 2026: citas con cierre en español
 
 - **El punto va después de la comilla de cierre** (“Hola”.), a pedido del equipo. Las comillas de las citas (`>` en el Doc) las ponía el CSS alrededor de todo el párrafo, con el punto adentro, y salían dobles si quien redactaba ya las había escrito. Ahora las escribe `lib/citas.ts` al mostrar la página: respeta las que ya existen y deja la atribución afuera (“…”, dice la vecina). Aplica a todas las notas sin republicar.
+
+### 20 de octubre de 2026: Voces es la sección de opinión
+
+- **Opinión se fusionó con Voces.** Voces recibía notas de entrevista y Opinión estaba vacía, pero la descripción del equipo para Voces ("líderes de opinión… expresan su perspectiva") es la de una sección de columnas. Ahora Voces es la sección de columnas firmadas: se ve como "Columna de opinión", con "Sobre…" y el aviso de responsabilidad, y el borrador automático ya no la elige. Quedan siete secciones.
+- **Las 4 notas de entrevista que estaban en Voces pasaron a Comunidad** (exilio de Lucía, autoridades ancestrales, IDSO, "cinco voces"), en el sitio y en sus Docs de Archivo, para que republicarlas no las devuelva a Voces.
+- La plantilla de columna ya dice "Voces"; las copias viejas que digan "Opinión" se publican igual en Voces. `/categoria/opinion` redirige a `/categoria/voces`. Manual PDF y guía web actualizados.
 
 ## Decisiones ya tomadas
 
@@ -83,6 +89,8 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 ## Pendientes
 
 ### Para verificar pronto
+
+- **Voces está vacía** desde el 20-oct hasta que se publique la primera columna. Conviene avisarle al equipo del cambio, y que el menú muestra una sección sin notas mientras tanto.
 
 - **Primera nota desde plantilla publicada por alguien del equipo.** Las copias de plantilla quedan a nombre de cada persona, no de la cuenta de Moncho. La service account debería poder moverlas igual (ya mueve Docs que no son suyos), pero no se probó con una cuenta del equipo.
 - **Doc de prueba de la nota de la zona 7** (creado el 31 de julio, "Nos ponen al final de la cola…"): sigue en Archivo. Si alguien lo mueve a Publicar, la nota reaparece. Mandarlo a la papelera o renombrarlo "PRUEBA – no publicar". Su fila en el Registro también sigue.

@@ -149,9 +149,11 @@ Para diagnosticar sin esperar la propagación: `dig +short tomolapalabra.com A @
 
 Todos los secrets (API keys, credenciales de Google, IDs de Drive) están en GitHub Secrets. Los valores reales solo existen ahí y en `.env.local` de Moncho, nunca en el código.
 
-## El repo vive en un disco exFAT: cuatro trampas
+## El repo vive en un disco exFAT: cinco trampas
 
-El proyecto está en `/Volumes/Pikachu`, un volumen exFAT que no guarda permisos Unix ni distingue mayúsculas:
+El proyecto está en `/Volumes/Pikachu` (en Mac; en Windows se monta como `E:\TomoLaPalabra`), un volumen exFAT que no guarda permisos Unix ni distingue mayúsculas:
+
+- **En Windows, git y `gh` fallan con "detected dubious ownership"**: exFAT no guarda dueño de archivo. Arreglo permanente: `git config --global --add safe.directory E:/TomoLaPalabra`. Sin tocar la config global: `git -c safe.directory=E:/TomoLaPalabra …`, y `gh … -R ramonzamora89/tomo-la-palabra`.
 
 - **`core.fileMode`**: sin desactivarlo, todos los archivos aparecen modificados (`100644 => 100755`). Ya está `core.fileMode=false` en la config local. Si `git status` muestra todo el repo modificado, es esto.
 - **`core.ignorecase=true`** (autodetectado): los patrones de `.gitignore` dejan de distinguir mayúsculas. La regla `VIDEOS/` capturaba también `app/videos/`, que quedó fuera del repo hasta que `/videos` dio 404 en producción. **Toda regla de `.gitignore` para una carpeta de la raíz va anclada con `/`** (`/VIDEOS/`, `/presentacion-flujo/`, `/manual-editorial/`).
