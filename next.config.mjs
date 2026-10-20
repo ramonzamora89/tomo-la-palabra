@@ -12,6 +12,8 @@ const nextConfig = {
       // "Reportaje" was retired in the October 2026 section overhaul; most
       // of its notes went to Profundidad.
       { source: "/categoria/reportaje", destination: "/categoria/profundidad", permanent: true },
+      // Opinión was folded into Voces, which became the opinion section.
+      { source: "/categoria/opinion", destination: "/categoria/voces", permanent: true },
       ...notaRedirects.map((r) => ({ ...r, permanent: true })),
     ];
   },

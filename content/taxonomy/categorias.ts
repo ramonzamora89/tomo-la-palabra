@@ -6,8 +6,11 @@
  * on category badges and card accents.
  *
  * `desdeEntrevista: false` keeps a section out of the drafting model's
- * choices: Opinión pieces are written by a columnist from the Opinión
+ * choices: Voces columns are written by a columnist from the Voces (opinion)
  * template, never drafted from an interview transcript.
+ *
+ * `alias` are other names an editor may type under "Sección". Voces was
+ * called Opinión until October 2026, and older template copies still say so.
  */
 export type Categoria = {
   slug: string;
@@ -15,6 +18,7 @@ export type Categoria = {
   descripcion: string;
   accent: "verde" | "amarillo";
   desdeEntrevista: boolean;
+  alias?: string[];
 };
 
 export const categorias: Categoria[] = [
@@ -22,9 +26,10 @@ export const categorias: Categoria[] = [
     slug: "voces",
     nombre: "Voces",
     descripcion:
-      "Personas expertas, líderes de opinión y representantes de sectores de la sociedad toman la palabra para expresar su perspectiva sobre los hechos que acentúan su interés.",
+      "Personas expertas, líderes de opinión y representantes de sectores de la sociedad toman la palabra para expresar su perspectiva sobre los hechos que acentúan su interés. Las opiniones expresadas son responsabilidad de quien las escribe y no representan necesariamente la línea editorial de Tomo la Palabra.",
     accent: "verde",
-    desdeEntrevista: true,
+    desdeEntrevista: false,
+    alias: ["Opinión"],
   },
   {
     slug: "reflector",
@@ -74,14 +79,6 @@ export const categorias: Categoria[] = [
     accent: "verde",
     desdeEntrevista: true,
   },
-  {
-    slug: "opinion",
-    nombre: "Opinión",
-    descripcion:
-      "Columnas firmadas por sus autoras y autores. Las opiniones expresadas son responsabilidad de quien las escribe y no representan necesariamente la línea editorial de Tomo la Palabra.",
-    accent: "amarillo",
-    desdeEntrevista: false,
-  },
 ];
 
 export function getCategoria(slug: string): Categoria | undefined {
@@ -99,10 +96,15 @@ function normalize(text: string): string {
 
 /**
  * Maps whatever an editor typed under "Sección" ("La Calle", "la calle",
- * "Opinión", "la-conversa"…) to a section slug. Undefined when it matches
+ * "Voces", "la-conversa"…) to a section slug. Undefined when it matches
  * none — the caller decides what to do with an unknown section.
  */
 export function resolveCategoria(text: string): Categoria | undefined {
   const key = normalize(text);
-  return categorias.find((c) => c.slug === key || normalize(c.nombre) === key);
+  return categorias.find(
+    (c) =>
+      c.slug === key ||
+      normalize(c.nombre) === key ||
+      (c.alias ?? []).some((a) => normalize(a) === key),
+  );
 }

@@ -44,14 +44,14 @@ cd cron && npx wrangler@4 deploy     # publica el reloj de Cloudflare (conserva 
 | `pipeline/src/lib/extractVideosCortos.ts` | Links de Reels/TikTok/Shorts → datos para incrustar |
 | `pipeline/src/lib/generateMdx.ts` | Frontmatter + cuerpo del `.mdx` |
 | `pipeline/src/lib/renamedNota.ts` | Titular cambiado → borra la nota vieja y agrega redirect |
-| `pipeline/src/createTemplate.ts` | Crea las plantillas Nota general / Opinión |
-| `content/taxonomy/categorias.ts` | Las ocho secciones, con su descripción |
+| `pipeline/src/createTemplate.ts` | Crea las plantillas Nota general / Voces (columna de opinión) |
+| `content/taxonomy/categorias.ts` | Las siete secciones, con su descripción |
 | `content/redirects.json` | Redirects 308 de notas renombradas (lo escribe el pipeline) |
 | `lib/schema.ts` | Contrato del frontmatter |
 | `lib/intercalarFotos.ts` | Reparte las fotos en el cuerpo al renderizar |
 | `lib/citas.ts` | Comillas de las citas (`>`) con el punto después del cierre: “Hola”. Al renderizar; reemplaza las comillas CSS de `prose` (apagadas en `tailwind.config.ts`) |
 | `lib/videosCortos.ts` | Reconoce links de cada red y arma la URL del reproductor (compartido con el pipeline) |
-| `app/nota/[slug]/page.tsx` | Página de nota: video o portada, cuerpo, fotos, videos cortos, variante Opinión |
+| `app/nota/[slug]/page.tsx` | Página de nota: video o portada, cuerpo, fotos, videos cortos, variante columna (Voces) |
 
 ## Arquitectura del pipeline
 
@@ -78,7 +78,7 @@ Estilo Título 1 o 2; se comparan sin tildes ni mayúsculas. Todo lo que está a
 | Titular | `title`, `slug` | El slug sale del titular; ver "Republicar" |
 | Sección | `category` | Nombre ("La Calle") o slug (`la-calle`), vía `resolveCategoria()`. Una sección desconocida se publica tal cual con un warning |
 | Autor (Autora, Autor/a, Autoría) | `author` | Vacío → "Redacción Tomo la Palabra". En JSON-LD, una firma que empieza por "Redacción" va como `Organization` |
-| Sobre el autor (Sobre la autora) | `authorBio` | Solo se muestra en Opinión |
+| Sobre el autor (Sobre la autora) | `authorBio` | Solo se muestra en Voces |
 | Destacada (Destacado) | `featured` | "sí"/"si"/"x" → `true`. La nota principal de la portada es la más reciente marcada; si ninguna, la última publicada |
 | Entradilla | `dek` | También meta description y OG |
 | Cuerpo | cuerpo del `.mdx` | Markdown |
@@ -90,7 +90,7 @@ Estilo Título 1 o 2; se comparan sin tildes ni mayúsculas. Todo lo que está a
 
 ### Secciones
 
-`content/taxonomy/categorias.ts`, definidas por el equipo en octubre de 2026: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle, Opinión. La descripción de cada una se muestra en su página y se le pasa a Claude para que elija; Opinión (`desdeEntrevista: false`) queda fuera de sus opciones. `/categoria/reportaje` (sección retirada) redirige a Profundidad en `next.config.mjs`. El menú completo aparece desde `xl` (1280 px); por debajo, hamburguesa.
+`content/taxonomy/categorias.ts`, definidas por el equipo en octubre de 2026: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle. La descripción de cada una se muestra en su página y se le pasa a Claude para que elija. **Voces es la sección de opinión** (columnas firmadas, `desdeEntrevista: false`), así que queda fuera de sus opciones. Hasta el 20-oct-2026 había además una sección Opinión y Voces recibía entrevistas: se fusionaron, las 4 notas de entrevista que estaban en Voces pasaron a Comunidad, `/categoria/opinion` redirige a Voces y "Opinión" sigue aceptándose como alias en el Doc (`alias` en `categorias.ts`). `/categoria/reportaje` (sección retirada) redirige a Profundidad en `next.config.mjs`. El menú completo aparece desde `xl` (1280 px); por debajo, hamburguesa.
 
 ### Imágenes: el bug de las fotos flotantes
 
@@ -116,7 +116,7 @@ Editar el Doc en Archivo y volver a moverlo a Publicar sobreescribe el `.mdx`, r
 
 ### Plantillas
 
-Creadas con `createTemplate.ts` en la raíz del proyecto, nunca en Publicar. Nota general: mismos encabezados que un borrador de entrevista, sin transcripción y con Sección vacía a propósito. Opinión: Sección ya en "Opinión", con "Sobre el autor" y sin YouTube URL. En el sitio, `category: opinion` cambia la firma ("Columna de opinión"), agrega "Sobre …" y el aviso de responsabilidad. Si se recrea una plantilla, el ID cambia: actualizar esta tabla y la guía web.
+Creadas con `createTemplate.ts` en la raíz del proyecto, nunca en Publicar. Nota general: mismos encabezados que un borrador de entrevista, sin transcripción y con Sección vacía a propósito. Columna de opinión: Sección ya en "Voces", con "Sobre el autor" y sin YouTube URL. En el sitio, `category: voces` cambia la firma ("Columna de opinión"), agrega "Sobre …" y el aviso de responsabilidad. Si se recrea una plantilla, el ID cambia: actualizar esta tabla y la guía web.
 
 ## Autenticación con Google: el gotcha más importante
 

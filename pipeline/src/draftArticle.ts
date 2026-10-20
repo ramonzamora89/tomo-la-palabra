@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { config } from "./lib/config";
 import { categorias } from "../../content/taxonomy/categorias";
 
-// Opinión is written by columnists, never drafted from an interview.
+// Voces (opinion) is written by columnists, never drafted from an interview.
 const seccionesDesdeEntrevista = categorias.filter((c) => c.desdeEntrevista);
 
 const client = new Anthropic({ apiKey: config.anthropicApiKey });

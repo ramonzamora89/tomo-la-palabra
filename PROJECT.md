@@ -20,8 +20,8 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 
 El sitio está en producción con dominio propio y 31 notas reales. El flujo editorial funciona solo, en GitHub Actions, con un reloj en Cloudflare que lo lanza a tiempo:
 
-- **Tres formas de empezar una nota**: subir una entrevista en video (el borrador se transcribe y redacta solo), o copiar una de las dos plantillas, **Nota general** u **Opinión**. Desde ahí, mover el Doc a Publicar lo publica en unos 15 minutos.
-- **Ocho secciones** definidas por el equipo: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle y Opinión.
+- **Tres formas de empezar una nota**: subir una entrevista en video (el borrador se transcribe y redacta solo), o copiar una de las dos plantillas, **Nota general** o **Columna de opinión** (sección Voces). Desde ahí, mover el Doc a Publicar lo publica en unos 15 minutos.
+- **Siete secciones** definidas por el equipo: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad y La Calle. Voces es la sección de opinión (columnas firmadas); hasta el 20-oct-2026 existía además una sección Opinión, que se fusionó con Voces.
 - **Desde el Doc** se controla la firma (`Autor`, por defecto "Redacción Tomo la Palabra"), la nota principal de la portada (`Destacada`), las fotos (todas se publican, repartidas en el texto) y los videos cortos de Instagram, TikTok o YouTube Shorts (`Videos cortos`).
 - **Corregir** una nota es editar su Doc en Archivo y volver a moverlo a Publicar. Conserva la fecha original; si cambió el titular, la URL vieja redirige a la nueva.
 
@@ -45,7 +45,7 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 
 - **Fotos recuperadas.** El equipo insertaba las fotos con ajuste de texto y el pipeline solo leía las que estaban "en línea": 30 de 32 notas se habían publicado sin imágenes. Se republicaron desde sus Docs y se recuperaron 75 fotos. Ahora la primera es la portada y las demás se reparten en el texto, una cada tres párrafos.
 - **Secciones definitivas** y reclasificación de las 32 notas, también en sus Docs. "Reportaje" desapareció; su URL redirige a Profundidad.
-- **Encabezados nuevos en el Doc**: `Autor`, `Destacada`, `Sobre el autor` (Opinión) y `Videos cortos`.
+- **Encabezados nuevos en el Doc**: `Autor`, `Destacada`, `Sobre el autor` (columnas de Voces) y `Videos cortos`.
 - **Plantillas de Nota general y Opinión**. La de nota general habilita notas sin entrevista, que hasta ahora estaban fuera del alcance.
 - **Se quitaron las 3 notas de ejemplo** del andamiaje inicial. Una de ellas, con texto de relleno, era la nota principal fija de la portada en vivo.
 - **Bugs corregidos**: republicar con otro titular duplicaba la nota; la fecha salía en UTC (un día después de noche) y se mostraba un día antes; el deploy posterior a Publish tomaba el commit anterior a la nota, que salía en vivo con 15 a 30 minutos de atraso.

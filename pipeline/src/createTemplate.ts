@@ -64,7 +64,7 @@ const PLANTILLAS: Record<Tipo, { nombre: string; instrucciones: string[]; seccio
       "",
       "1. No escribas sobre esta plantilla: Archivo › Hacer una copia, y guardá la copia en la carpeta Borradores.",
       "2. Escribí debajo de cada encabezado verde. No cambies ni borres los encabezados: el sistema los usa para saber qué es cada cosa.",
-      "3. Sección: dejala como Opinión.",
+      "3. Sección: dejala como Voces.",
       "4. Autor: el nombre tal como debe aparecer en la firma. Sobre el autor: una o dos líneas sobre quien escribe (opcional).",
       "5. Destacada: escribí sí para que la columna sea la nota principal de la portada; si no, dejá no.",
       "6. Entradilla: uno o dos párrafos que resuman la columna. Es también el resumen que muestran Google y las redes.",
@@ -76,7 +76,7 @@ const PLANTILLAS: Record<Tipo, { nombre: string; instrucciones: string[]; seccio
     ],
     secciones: [
       { heading: "Titular", body: "" },
-      { heading: "Sección", body: "Opinión" },
+      { heading: "Sección", body: "Voces" },
       { heading: "Autor", body: "" },
       { heading: "Sobre el autor", body: "" },
       { heading: "Destacada", body: "no" },

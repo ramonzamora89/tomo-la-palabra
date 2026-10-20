@@ -74,7 +74,8 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
   const categoria = getCategoria(nota.category);
   const related = getRelatedNotas(nota);
   const videoJsonLd = videoObjectJsonLd(nota);
-  const esOpinion = nota.category === "opinion";
+  // Voces is the opinion section: signed columns, not interviews.
+  const esOpinion = nota.category === "voces";
   // The paper texture is the "no photo" placeholder — fine on a card, but
   // an empty textured box at the top of the note itself reads as a bug.
   const hasCover = nota.coverImage !== "/images/paper-texture.svg";
