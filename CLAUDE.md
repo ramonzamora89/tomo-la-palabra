@@ -117,7 +117,7 @@ Por ahora se escriben a mano en el `.mdx`; el pipeline no los conoce. Se usaron 
 - **`publishAt`** (con comillas y zona horaria: `'2026-10-25T03:00:00-06:00'`; sin comillas, YAML lo convierte en fecha y Zod lo rechaza). Hasta esa hora `getAllNotas()` deja la nota fuera de portada, secciones, tags, sitemap, relacionadas y `llms.txt`, pero su página se construye igual (`getSlugsParaPaginas()`) y `middleware.ts` la cierra con HTTP Basic: cualquier usuario y la contraseña `EMBARGO_PASSWORD`. A la hora exacta el middleware la abre sin deploy. Los bots de vista previa de redes (Facebook, X, WhatsApp…) pasan siempre, para que las publicaciones programadas tengan titular e imagen.
 - **`EMBARGO_PASSWORD`** vive en Vercel (Production), tipo Config (ver el gotcha de `vercel pull`), y `next.config.mjs` la incrusta en el middleware al compilar, junto con la lista de embargos. Si falta, la nota queda cerrada hasta su hora. Cambiarla exige un deploy manual (`gh workflow run deploy.yml`).
 - **Portada y listas** recién la incluyen en el primer deploy posterior a la hora: `deploy.yml` anota `buildStartedAt` en la metadata de cada deploy y, si un `publishAt` cayó entre ese momento y ahora, despliega aunque el commit sea el mismo. Lo dispara el Publish del reloj de Cloudflare (:04, :19, :34, :49), así que entra entre 5 y 20 minutos después de la hora.
-- **`especial: true`**: portada y fotos más anchas que la columna de texto (desde `lg`). Las fotos se colocan a mano con `<Foto n="0" />` (índice en `images`) y sin `<Galeria />`, así `intercalarFotos` no las mueve. `<Epigrafe cancion="…" autor="…" versos="verso | verso" />` para estrofas en itálica y `<Pausa />` para el `***` entre secciones (`components/Especial.tsx`).
+- **`especial: true`**: portada y fotos más anchas que la columna de texto (desde `lg`). Las fotos se colocan a mano con `<Foto n="0" />` (índice en `images`) y sin `<Galeria />`, así `intercalarFotos` no las mueve. `<Epigrafe cancion="…" autor="…" versos="verso | verso" spotify="<ID de pista>" />` para estrofas en itálica, con el reproductor compacto de Spotify debajo si lleva `spotify`, y `<Pausa />` para el `***` entre secciones (`components/Especial.tsx`).
 
 ### Republicar y renombrar
 
@@ -192,6 +192,10 @@ Ver `.env.example` para la lista completa. Nunca leer `.env.local` directo (cont
 `YOUTUBE_API_KEY` y `YOUTUBE_CHANNEL_ID` viven **en Vercel (Production) y en `.env.local`**, no en GitHub Secrets: `deploy.yml` las obtiene con `vercel pull`.
 
 **Gotcha de Vercel, Secret vs Config**: las variables tipo `Secret` (antes "Sensitive") **no se descargan con `vercel pull`**: el CLI escribe el literal `[SENSITIVE]` y el build sigue con ese valor. El síntoma es "no se encontraron videos", sin error. Como el build corre en GitHub Actions, **toda variable que el build necesite tiene que ser `Config`**. El tipo no se puede cambiar: hay que borrar la variable y recrearla.
+
+## Anuncios
+
+`AdSlot` no muestra nada mientras `NEXT_PUBLIC_ADSENSE_CLIENT_ID` no esté en Vercel (`ANUNCIOS_ACTIVOS`): antes se veían cajas punteadas vacías en todo el sitio. Al aprobarse AdSense, agregar esa variable (tipo Config) y lanzar un deploy manual; los espacios aparecen solos.
 
 ## Sistema de diseño
 

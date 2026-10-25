@@ -13,8 +13,20 @@ const SIZES: Record<AdSlotType, string> = {
  * provider itself is chosen by NEXT_PUBLIC_AD_PROVIDER so a future local/
  * direct-sold rotator can be swapped in later without touching any page.
  */
+const provider = process.env.NEXT_PUBLIC_AD_PROVIDER ?? "adsense";
+
+/**
+ * Ad slots only show once there's something to fill them: AdSense with its
+ * client ID set (NEXT_PUBLIC_ADSENSE_CLIENT_ID in Vercel). Until then they'd
+ * render as empty dashed boxes across the site. The local provider has no
+ * rotator yet, so it stays off too. Pages also use this to drop the
+ * spacing around a slot.
+ */
+export const ANUNCIOS_ACTIVOS =
+  provider === "adsense" && !!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+
 export function AdSlot({ id, type }: { id: string; type: AdSlotType }) {
-  const provider = process.env.NEXT_PUBLIC_AD_PROVIDER ?? "adsense";
+  if (!ANUNCIOS_ACTIVOS) return null;
 
   return (
     <div

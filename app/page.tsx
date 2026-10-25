@@ -3,7 +3,7 @@ import { categorias } from "@/content/taxonomy/categorias";
 import { Hero } from "@/components/Hero";
 import { ArticleCard } from "@/components/ArticleCard";
 import { GrungeDivider } from "@/components/GrungeDivider";
-import { AdSlot } from "@/components/AdSlot";
+import { AdSlot, ANUNCIOS_ACTIVOS } from "@/components/AdSlot";
 
 export default function HomePage() {
   const notas = getAllNotas();
@@ -24,9 +24,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4">
-        <AdSlot id="home-leaderboard" type="leaderboard" />
-      </div>
+      {ANUNCIOS_ACTIVOS && (
+        <div className="mx-auto max-w-6xl px-4">
+          <AdSlot id="home-leaderboard" type="leaderboard" />
+        </div>
+      )}
 
       {categorias.map((categoria) => {
         const notasCategoria = notas.filter((n) => n.category === categoria.slug);

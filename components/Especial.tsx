@@ -14,15 +14,19 @@ export const FOTO_AMPLIA_SIZES = "(min-width: 1280px) 992px, (min-width: 1024px)
 /**
  * A song stanza opening a section: one verse per line, in italics, with
  * the song and artist below. Verses are separated by "|" in `versos`.
+ * `spotify` (a track ID, from open.spotify.com/track/<ID>) adds Spotify's
+ * compact player underneath — lazy-loaded, like the short-video embeds.
  */
 export function Epigrafe({
   versos,
   cancion,
   autor,
+  spotify,
 }: {
   versos: string;
   cancion: string;
   autor: string;
+  spotify?: string;
 }) {
   const lineas = versos.split("|").map((l) => l.trim());
   return (
@@ -40,6 +44,25 @@ export function Epigrafe({
       <figcaption className="mt-3 text-sm uppercase tracking-wide text-ink-600">
         “{cancion}”, {autor}
       </figcaption>
+      {spotify && (
+        <>
+          <iframe
+            src={`https://open.spotify.com/embed/track/${spotify}?utm_source=generator`}
+            title={`Escuchar “${cancion}”, de ${autor}, en Spotify`}
+            width="100%"
+            height="80"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            className="mt-3 rounded-xl border-0"
+          />
+          <a
+            href={`https://open.spotify.com/track/${spotify}`}
+            className="mt-1 inline-block text-xs text-ink-600 underline hover:text-brand-verde"
+          >
+            Escuchar en Spotify
+          </a>
+        </>
+      )}
     </figure>
   );
 }

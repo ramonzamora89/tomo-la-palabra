@@ -6,7 +6,7 @@ import { enEmbargo, getNotaBySlug, getRelatedNotas, getSlugsParaPaginas } from "
 import { getCategoria } from "@/content/taxonomy/categorias";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ArticleCard } from "@/components/ArticleCard";
-import { AdSlot } from "@/components/AdSlot";
+import { AdSlot, ANUNCIOS_ACTIVOS } from "@/components/AdSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { TranscriptToggle } from "@/components/TranscriptToggle";
 import { Foto, Galeria } from "@/components/Galeria";
@@ -174,9 +174,11 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
         </aside>
       )}
 
-      <div className="my-10">
-        <AdSlot id={`nota-${nota.slug}-in-article`} type="in-article" />
-      </div>
+      {ANUNCIOS_ACTIVOS && (
+        <div className="my-10">
+          <AdSlot id={`nota-${nota.slug}-in-article`} type="in-article" />
+        </div>
+      )}
 
       {related.length > 0 && (
         <section className="mt-12 border-t border-brand-gris pt-8">
@@ -189,9 +191,11 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
         </section>
       )}
 
-      <div className="mt-10">
-        <AdSlot id={`nota-${nota.slug}-rectangle`} type="rectangle" />
-      </div>
+      {ANUNCIOS_ACTIVOS && (
+        <div className="mt-10">
+          <AdSlot id={`nota-${nota.slug}-rectangle`} type="rectangle" />
+        </div>
+      )}
     </article>
   );
 }
