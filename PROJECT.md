@@ -16,7 +16,7 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 - **Presentación del flujo**: `presentacion-flujo/propuesta.pdf` y `.pptx`. No está en git.
 - **Canal de YouTube**: `UC3bxUswJgceF-gA7GEXAV2w` (1,409 suscriptores y 15.1 K horas de reproducción al 7 de septiembre de 2026).
 
-## Estado actual (20 de octubre de 2026)
+## Estado actual (25 de octubre de 2026)
 
 El sitio está en producción con dominio propio y 31 notas reales. El flujo editorial funciona solo, en GitHub Actions, con un reloj en Cloudflare que lo lanza a tiempo:
 
@@ -68,6 +68,13 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 - **Las 4 notas de entrevista que estaban en Voces pasaron a Comunidad** (exilio de Lucía, autoridades ancestrales, IDSO, "cinco voces"), en el sitio y en sus Docs de Archivo, para que republicarlas no las devuelva a Voces.
 - La plantilla de columna ya dice "Voces"; las copias viejas que digan "Opinión" se publican igual en Voces. `/categoria/opinion` redirige a `/categoria/voces`. Manual PDF y guía web actualizados.
 
+### 24 y 25 de octubre de 2026: obituario de Solórzano Foppa, primera nota con embargo
+
+- **Nota especial de lanzamiento**: "Obituario: Solórzano Foppa, el adiós al hombre que bailó a la corrupción", de Juan Luis García, en Comunidad y destacada. Se armó a mano desde un Doc que no seguía la plantilla: las fotos venían como links de Drive (PNG de 30 a 55 MB, reducidos a JPEG de ~300 KB) y se colocaron donde las marcaba el Doc. Entradilla y texto alternativo de las fotos los propuso Claude; la entradilla la aprobó Moncho. Se corrigieron las grafías del apellido (Solórzano) y algunas tildes; "contra del pandillero" y "Mejíal" quedaron como en el Doc.
+- **Embargo con contraseña**: nuevo campo `publishAt`. La nota quedó en producción desde la noche del 24, cerrada con la contraseña del equipo (`EMBARGO_PASSWORD` en Vercel, tipo Config), y se abre sola a las 3:00 a. m. del 25 para que las publicaciones en redes se pudieran programar con el link. Los bots de vista previa de redes la ven antes. El repo es público, así que el texto estuvo visible en GitHub durante el embargo: se aceptó por ser unas pocas horas.
+- **Formato especial** (`especial: true`): fotos más anchas que el texto, epígrafes con las estrofas de salsa en itálica y verso por verso, con el reproductor de Spotify de cada canción debajo, y separadores entre secciones.
+- **Anuncios ocultos**: los espacios de AdSense se veían como cajas punteadas vacías en todo el sitio. Ahora no aparecen hasta que exista `NEXT_PUBLIC_ADSENSE_CLIENT_ID` en Vercel.
+
 ## Decisiones ya tomadas
 
 - Video embebido de YouTube, no autohospedado. Los videos cortos usan el reproductor oficial de cada red.
@@ -90,6 +97,9 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 
 ### Para verificar pronto
 
+- **Confirmar que el obituario entró solo a la portada el 25-oct** entre las 3:05 y las 3:20 a. m. Es la primera vez que corre el redeploy por embargo de `deploy.yml`, que depende de la metadata `buildStartedAt` del deploy anterior. Si no entró: `gh workflow run deploy.yml -R ramonzamora89/tomo-la-palabra`.
+- **Embargos desde el Doc**: hoy `publishAt` y las notas especiales solo se escriben a mano en el `.mdx`. Si el equipo lo va a usar seguido, agregar encabezados "Publicar a las" y fotos colocadas en el Doc a `parseDoc.ts` y a la plantilla.
+- **Confirmar con el autor** "Aldo Dupié Ochoa Mejíal" (¿Mejía?) en el obituario.
 - **Voces está vacía** desde el 20-oct hasta que se publique la primera columna. Conviene avisarle al equipo del cambio, y que el menú muestra una sección sin notas mientras tanto.
 
 - **Primera nota desde plantilla publicada por alguien del equipo.** Las copias de plantilla quedan a nombre de cada persona, no de la cuenta de Moncho. La service account debería poder moverlas igual (ya mueve Docs que no son suyos), pero no se probó con una cuenta del equipo.
