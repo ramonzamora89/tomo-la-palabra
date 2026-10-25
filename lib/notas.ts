@@ -12,7 +12,14 @@ function readNota(fileName: string): Nota {
   return { ...frontmatter, content };
 }
 
-export function getAllNotas(): Nota[] {
+/** True while a note's `publishAt` is still in the future. */
+export function enEmbargo(nota: Pick<Nota, "publishAt">, ahora = Date.now()): boolean {
+  return !!nota.publishAt && Date.parse(nota.publishAt) > ahora;
+}
+
+// Every note on disk, embargoed ones included — only for building their
+// pages, which middleware.ts keeps behind a password until publishAt.
+function getTodasLasNotas(): Nota[] {
   if (!fs.existsSync(NOTAS_DIR)) return [];
   return fs
     .readdirSync(NOTAS_DIR)
@@ -21,8 +28,17 @@ export function getAllNotas(): Nota[] {
     .sort((a, b) => (a.pubDate < b.pubDate ? 1 : -1));
 }
 
+/** Published notes: everything that feeds listings, sitemap and related. */
+export function getAllNotas(): Nota[] {
+  return getTodasLasNotas().filter((n) => !enEmbargo(n));
+}
+
+export function getSlugsParaPaginas(): string[] {
+  return getTodasLasNotas().map((n) => n.slug);
+}
+
 export function getNotaBySlug(slug: string): Nota | undefined {
-  return getAllNotas().find((n) => n.slug === slug);
+  return getTodasLasNotas().find((n) => n.slug === slug);
 }
 
 export function getNotasByCategoria(categoria: string): Nota[] {

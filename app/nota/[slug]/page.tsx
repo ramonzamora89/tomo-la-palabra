@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { Metadata } from "next";
-import { getAllNotas, getNotaBySlug, getRelatedNotas } from "@/lib/notas";
+import { enEmbargo, getNotaBySlug, getRelatedNotas, getSlugsParaPaginas } from "@/lib/notas";
 import { getCategoria } from "@/content/taxonomy/categorias";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -10,6 +10,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { TranscriptToggle } from "@/components/TranscriptToggle";
 import { Foto, Galeria } from "@/components/Galeria";
+import { Epigrafe, FOTO_AMPLIA, FOTO_AMPLIA_SIZES, Pausa } from "@/components/Especial";
 import { intercalarFotos } from "@/lib/intercalarFotos";
 import { citasEnEspanol } from "@/lib/citas";
 import { VideosCortos } from "@/components/VideosCortos";
@@ -21,7 +22,9 @@ import {
 } from "@/lib/seo";
 
 export function generateStaticParams() {
-  return getAllNotas().map((n) => ({ slug: n.slug }));
+  // Embargoed notes too: their page is built ahead of time and middleware.ts
+  // holds it behind the team's password until publishAt.
+  return getSlugsParaPaginas().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -37,7 +40,7 @@ export async function generateMetadata({
     title: nota.title,
     description: nota.dek,
     alternates: { canonical: nota.canonicalUrl ?? absoluteUrl(`/nota/${nota.slug}`) },
-    robots: nota.noindex ? { index: false, follow: false } : undefined,
+    robots: nota.noindex || enEmbargo(nota) ? { index: false, follow: false } : undefined,
     openGraph: {
       title: nota.title,
       description: nota.dek,
@@ -126,14 +129,16 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
           />
         </div>
       ) : hasCover ? (
-        <div className="relative mt-6 aspect-video overflow-hidden bg-ink-200">
+        <div
+          className={`relative mt-6 aspect-video overflow-hidden bg-ink-200 ${nota.especial ? FOTO_AMPLIA : ""}`}
+        >
           <Image
             src={nota.coverImage}
             alt={nota.coverImageAlt}
             fill
             priority
             className="object-cover"
-            sizes="(min-width: 768px) 768px, 100vw"
+            sizes={nota.especial ? FOTO_AMPLIA_SIZES : "(min-width: 768px) 768px, 100vw"}
           />
         </div>
       ) : null}
@@ -143,7 +148,11 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
           source={content}
           components={{
             TranscriptToggle,
-            Foto: ({ n }: { n: string }) => <Foto img={nota.images[Number(n)]} />,
+            Foto: ({ n }: { n: string }) => (
+              <Foto img={nota.images[Number(n)]} amplia={nota.especial} />
+            ),
+            Epigrafe,
+            Pausa,
             Galeria: () => <Galeria images={nota.images.slice(usadas)} />,
             VideosCortos: () => <VideosCortos nota={nota} />,
           }}

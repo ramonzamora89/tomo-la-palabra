@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Nota } from "@/lib/schema";
+import { FOTO_AMPLIA, FOTO_AMPLIA_SIZES } from "./Especial";
 
 type Imagen = Nota["images"][number];
 
@@ -8,8 +9,22 @@ type Imagen = Nota["images"][number];
  * vertical portrait stays vertical). lib/intercalarFotos.ts places these
  * through the body as `<Foto n="…" />`.
  */
-export function Foto({ img }: { img: Imagen | undefined }) {
+export function Foto({ img, amplia }: { img: Imagen | undefined; amplia?: boolean }) {
   if (!img) return null;
+  if (amplia && img.width && img.height) {
+    return (
+      <figure className={`not-prose my-12 ${FOTO_AMPLIA}`}>
+        <Image
+          src={img.src}
+          alt={img.alt}
+          width={img.width}
+          height={img.height}
+          className="h-auto w-full"
+          sizes={FOTO_AMPLIA_SIZES}
+        />
+      </figure>
+    );
+  }
   return (
     <figure className="not-prose my-10">
       {img.width && img.height ? (

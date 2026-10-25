@@ -52,6 +52,14 @@ export const notaSchema = z.object({
   // edited Titular (new slug) find and replace the old note.
   sourceDocId: z.string().optional(),
   noindex: z.boolean().optional(),
+  // Embargo: ISO date-time with offset ("2026-10-25T03:00:00-06:00"). Until
+  // then the note is left out of every listing and its page asks for the
+  // team's password (middleware.ts); at that minute the page opens on its
+  // own, and the next deploy (deploy.yml) adds it to the homepage.
+  publishAt: z.string().optional(),
+  // Hand-built special pieces: wider photos, plus epigraphs and section
+  // breaks placed by hand in the MDX (<Epigrafe />, <Pausa />, <Foto />).
+  especial: z.boolean().optional(),
   // Reserved for later phases — unused in v1, see plan.
   premium: z.boolean().optional(),
   featured: z.boolean().optional(),

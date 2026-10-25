@@ -110,6 +110,15 @@ Google Docs guarda una imagen en `inlineObjects` solo si está "en línea con el
 
 `pubDate` usa la fecha de Guatemala (`todayInGuatemala()` en `slug.ts`); antes era UTC y lo publicado después de las 6 p. m. salía con fecha del día siguiente. Al mostrarla, `formatDate` formatea con `timeZone: "UTC"` porque `"2026-10-07"` se parsea como medianoche UTC y en Guatemala sería el día anterior.
 
+### Notas con embargo y notas especiales
+
+Por ahora se escriben a mano en el `.mdx`; el pipeline no los conoce. Se usaron por primera vez con el obituario de Solórzano Foppa (25-oct-2026, 3:00 a. m.).
+
+- **`publishAt`** (con comillas y zona horaria: `'2026-10-25T03:00:00-06:00'`; sin comillas, YAML lo convierte en fecha y Zod lo rechaza). Hasta esa hora `getAllNotas()` deja la nota fuera de portada, secciones, tags, sitemap, relacionadas y `llms.txt`, pero su página se construye igual (`getSlugsParaPaginas()`) y `middleware.ts` la cierra con HTTP Basic: cualquier usuario y la contraseña `EMBARGO_PASSWORD`. A la hora exacta el middleware la abre sin deploy. Los bots de vista previa de redes (Facebook, X, WhatsApp…) pasan siempre, para que las publicaciones programadas tengan titular e imagen.
+- **`EMBARGO_PASSWORD`** vive en Vercel (Production), tipo Config (ver el gotcha de `vercel pull`), y `next.config.mjs` la incrusta en el middleware al compilar, junto con la lista de embargos. Si falta, la nota queda cerrada hasta su hora. Cambiarla exige un deploy manual (`gh workflow run deploy.yml`).
+- **Portada y listas** recién la incluyen en el primer deploy posterior a la hora: `deploy.yml` anota `buildStartedAt` en la metadata de cada deploy y, si un `publishAt` cayó entre ese momento y ahora, despliega aunque el commit sea el mismo. Lo dispara el Publish del reloj de Cloudflare (:04, :19, :34, :49), así que entra entre 5 y 20 minutos después de la hora.
+- **`especial: true`**: portada y fotos más anchas que la columna de texto (desde `lg`). Las fotos se colocan a mano con `<Foto n="0" />` (índice en `images`) y sin `<Galeria />`, así `intercalarFotos` no las mueve. `<Epigrafe cancion="…" autor="…" versos="verso | verso" />` para estrofas en itálica y `<Pausa />` para el `***` entre secciones (`components/Especial.tsx`).
+
 ### Republicar y renombrar
 
 Editar el Doc en Archivo y volver a moverlo a Publicar sobreescribe el `.mdx`, reemplaza sus imágenes (borra las que ya no estén en el Doc), **conserva `pubDate`** y marca `updatedDate`. Cada nota guarda `sourceDocId`: si el Titular cambió (slug nuevo), `renamedNota.ts` borra la nota vieja y agrega un redirect 308 en `content/redirects.json`, que lee `next.config.mjs`. Las cadenas se colapsan (A→B→C queda A→C) y volver a un titular anterior no deja redirects circulares. Cada republicación agrega una fila nueva en el Registro.

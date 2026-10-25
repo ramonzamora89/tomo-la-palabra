@@ -57,11 +57,36 @@ jobs:
             exit 0
           fi
           SHA="$(git rev-parse HEAD)"
-          LATEST_SHA=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
+          LATEST=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=production&limit=1&state=READY" \
-            | jq -r '.deployments[0].meta.githubCommitSha // empty' || echo "")
+            || echo "{}")
+          LATEST_SHA=$(echo "$LATEST" | jq -r '.deployments[0].meta.githubCommitSha // empty' || echo "")
+          # Cuándo empezó el build de ese deploy (ms), anotado por el paso de
+          # deploy; los deploys viejos no lo tienen.
+          LATEST_BUILD=$(echo "$LATEST" | jq -r '.deployments[0].meta.buildStartedAt // empty' || echo "")
           echo "Commit a desplegar: $SHA"
           echo "Último deploy en producción: ${LATEST_SHA:-<no se pudo determinar>}"
+
+          # Una nota con embargo (publishAt) ya viaja en el commit, pero el
+          # build la deja fuera de portada, secciones y sitemap hasta su hora.
+          # Si esa hora pasó después del último build, hay que reconstruir
+          # aunque el commit sea el mismo. El reloj de Cloudflare lanza
+          # Publish cada 15 min, y este workflow lo sigue.
+          NOW_MS=$(( $(date +%s) * 1000 ))
+          LIBERADA=""
+          for T in $(grep -h '^publishAt:' content/notas/*.mdx 2>/dev/null \
+                       | sed -E "s/^publishAt:[[:space:]]*['\"]?([^'\"]+)['\"]?[[:space:]]*$/\1/" || true); do
+            T_MS=$(( $(date -d "$T" +%s) * 1000 ))
+            if [ "$T_MS" -le "$NOW_MS" ] && [ "$T_MS" -gt "${LATEST_BUILD:-$NOW_MS}" ]; then
+              LIBERADA="$T"
+            fi
+          done
+          if [ -n "$LIBERADA" ]; then
+            echo "Se cumplió el embargo de una nota ($LIBERADA) después del último build: se despliega."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [ -n "$LATEST_SHA" ] && [ "$SHA" = "$LATEST_SHA" ]; then
             echo "Ya está desplegado, se omite el build/deploy."
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -84,10 +109,13 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
+          # Lo lee el chequeo de embargos del próximo deploy: una nota cuya
+          # hora pasó después de este momento no entró en este build.
+          BUILD_STARTED_AT=$(( $(date +%s) * 1000 ))
           npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           npx vercel build --prod --token="$VERCEL_TOKEN"
           # --archive=tgz sube el build como un solo archivo. Sin esto, cada
           # archivo de .vercel/output cuenta contra el límite de 5000 subidas
           # diarias del plan gratuito (api-upload-free), que se agotó con
           # unos pocos deploys el 2026-08-09 y otra vez el 2026-10-08.
-          npx vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
+          npx vercel deploy --prebuilt --prod --archive=tgz --meta buildStartedAt="$BUILD_STARTED_AT" --token="$VERCEL_TOKEN"
