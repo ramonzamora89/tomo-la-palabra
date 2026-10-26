@@ -197,6 +197,10 @@ Ver `.env.example` para la lista completa. Nunca leer `.env.local` directo (cont
 
 `AdSlot` no muestra nada mientras `NEXT_PUBLIC_ADSENSE_CLIENT_ID` no esté en Vercel (`ANUNCIOS_ACTIVOS`): antes se veían cajas punteadas vacías en todo el sitio. Al aprobarse AdSense, agregar esa variable (tipo Config) y lanzar un deploy manual; los espacios aparecen solos.
 
+## Google Analytics
+
+GA4 (`G-JZZ28BB0P9`) se carga en `app/layout.tsx` con `next/script`, solo en builds de producción. El ID es público, por eso va en el código y no en Vercel. La navegación entre páginas la cuenta la "medición mejorada" de GA4 (cambios en el historial del navegador): si se desactiva en la propiedad, solo se contaría la primera página de cada visita. `/privacidad` lo menciona.
+
 ## Sistema de diseño
 
 Colores y tipografías del brandbook (`TOMO LA PALABRA_BRANDBOOK 2025.pdf`, no en git). Paleta en `tailwind.config.ts` (`brand.verde/amarillo/crema/gris` y una escala `ink` cálida). **Las fuentes Chantal y Dreamwalker no existen como archivos con licencia**: el sitio usa Anton (por Dreamwalker) y Permanent Marker (por Chantal), marcadas con `TODO` en `app/layout.tsx`. El texto corrido usa Raleway.

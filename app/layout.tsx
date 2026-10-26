@@ -15,6 +15,13 @@ const bodyFont = Raleway({ subsets: ["latin"], variable: "--font-body" });
 const displayFont = Anton({ subsets: ["latin"], weight: "400", variable: "--font-display" });
 const handFont = Permanent_Marker({ subsets: ["latin"], weight: "400", variable: "--font-hand" });
 
+// Google Analytics 4. The measurement ID is public (it ships in every page),
+// so it lives here instead of in Vercel. Only production builds load it, so
+// `npm run dev` doesn't count as visits. Client-side navigations are tracked
+// by GA4's enhanced measurement ("page changes based on browser history").
+const GA_MEASUREMENT_ID = "G-JZZ28BB0P9";
+const ANALYTICS_ACTIVO = process.env.NODE_ENV === "production";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
@@ -39,6 +46,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
             crossOrigin="anonymous"
           />
+        )}
+        {ANALYTICS_ACTIVO && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+            </Script>
+          </>
         )}
         <SiteHeader />
         <main id="main-content">{children}</main>

@@ -47,6 +47,21 @@ export default function PrivacidadPage() {
           Nada se publica automáticamente. Cada borrador lo revisa una persona del equipo, y
           solo las notas que el equipo decide publicar aparecen en este sitio.
         </p>
+
+        <h2 className="pt-4 font-display text-xl text-brand-verde">Medición de visitas</h2>
+        <p>
+          Este sitio usa Google Analytics para contar visitas y saber qué notas se leen más. Google
+          Analytics usa cookies y recibe datos como las páginas visitadas, el tipo de dispositivo y
+          la ubicación aproximada, sin identificar a la persona. Podés bloquearlo con la
+          configuración de cookies de tu navegador o con el{" "}
+          <a
+            href="https://tools.google.com/dlpage/gaoptout"
+            className="text-brand-verde underline"
+          >
+            complemento de inhabilitación de Google Analytics
+          </a>
+          .
+        </p>
       </div>
     </section>
   );
