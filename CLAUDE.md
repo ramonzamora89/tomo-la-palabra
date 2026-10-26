@@ -199,7 +199,7 @@ Ver `.env.example` para la lista completa. Nunca leer `.env.local` directo (cont
 
 ## Google Analytics
 
-GA4 (`G-JZZ28BB0P9`) se carga en `app/layout.tsx` con `next/script`, solo en builds de producción. El ID es público, por eso va en el código y no en Vercel. La navegación entre páginas la cuenta la "medición mejorada" de GA4 (cambios en el historial del navegador): si se desactiva en la propiedad, solo se contaría la primera página de cada visita. `/privacidad` lo menciona.
+GA4 (`G-JZZ28BB0P9`) se carga en `app/layout.tsx` con `<script>` simples en `<head>`, solo en builds de producción. No con `next/script`: ese los inserta por JS, el HTML solo trae un `preload` y el "Probar" de Google dice que no encuentra la etiqueta. El ID es público, por eso va en el código y no en Vercel. La navegación entre páginas la cuenta la "medición mejorada" de GA4 (cambios en el historial del navegador): si se desactiva en la propiedad, solo se contaría la primera página de cada visita. `/privacidad` lo menciona.
 
 ## Sistema de diseño
 

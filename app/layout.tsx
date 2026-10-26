@@ -19,6 +19,8 @@ const handFont = Permanent_Marker({ subsets: ["latin"], weight: "400", variable:
 // so it lives here instead of in Vercel. Only production builds load it, so
 // `npm run dev` doesn't count as visits. Client-side navigations are tracked
 // by GA4's enhanced measurement ("page changes based on browser history").
+// Plain <script> tags in <head>, not next/script: next/script injects them
+// with JS, and Google's "Probar" checker only reads the static HTML.
 const GA_MEASUREMENT_ID = "G-JZZ28BB0P9";
 const ANALYTICS_ACTIVO = process.env.NODE_ENV === "production";
 
@@ -34,6 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="es-GT" className={`${bodyFont.variable} ${displayFont.variable} ${handFont.variable}`}>
+      {ANALYTICS_ACTIVO && (
+        <head>
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`,
+            }}
+          />
+        </head>
+      )}
       <body className="font-sans">
         <a href="#main-content" className="sr-only-focusable bg-brand-verde px-4 py-2 text-white">
           Saltar al contenido principal
@@ -46,20 +64,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
             crossOrigin="anonymous"
           />
-        )}
-        {ANALYTICS_ACTIVO && (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_MEASUREMENT_ID}');`}
-            </Script>
-          </>
         )}
         <SiteHeader />
         <main id="main-content">{children}</main>
