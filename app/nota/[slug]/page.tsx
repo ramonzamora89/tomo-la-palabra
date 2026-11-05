@@ -10,7 +10,7 @@ import { AdSlot, ANUNCIOS_ACTIVOS } from "@/components/AdSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { TranscriptToggle } from "@/components/TranscriptToggle";
 import { Foto, Galeria } from "@/components/Galeria";
-import { Epigrafe, FOTO_AMPLIA, FOTO_AMPLIA_SIZES, Pausa } from "@/components/Especial";
+import { Epigrafe, FOTO_AMPLIA, FOTO_AMPLIA_SIZES, Incrustado, Pausa } from "@/components/Especial";
 import { intercalarFotos } from "@/lib/intercalarFotos";
 import { citasEnEspanol } from "@/lib/citas";
 import { VideosCortos } from "@/components/VideosCortos";
@@ -129,18 +129,33 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
           />
         </div>
       ) : hasCover ? (
-        <div
-          className={`relative mt-6 aspect-video overflow-hidden bg-ink-200 ${nota.especial ? FOTO_AMPLIA : ""}`}
-        >
-          <Image
-            src={nota.coverImage}
-            alt={nota.coverImageAlt}
-            fill
-            priority
-            className="object-cover"
-            sizes={nota.especial ? FOTO_AMPLIA_SIZES : "(min-width: 768px) 768px, 100vw"}
-          />
-        </div>
+        <figure className={`mt-6 ${nota.especial ? FOTO_AMPLIA : ""}`}>
+          {nota.portadaCompleta && nota.coverImageWidth && nota.coverImageHeight ? (
+            <Image
+              src={nota.coverImage}
+              alt={nota.coverImageAlt}
+              width={nota.coverImageWidth}
+              height={nota.coverImageHeight}
+              priority
+              className="h-auto w-full bg-ink-200"
+              sizes={nota.especial ? FOTO_AMPLIA_SIZES : "(min-width: 768px) 768px, 100vw"}
+            />
+          ) : (
+            <div className="relative aspect-video overflow-hidden bg-ink-200">
+              <Image
+                src={nota.coverImage}
+                alt={nota.coverImageAlt}
+                fill
+                priority
+                className="object-cover"
+                sizes={nota.especial ? FOTO_AMPLIA_SIZES : "(min-width: 768px) 768px, 100vw"}
+              />
+            </div>
+          )}
+          {nota.coverImageCredit && (
+            <figcaption className="mt-2 text-sm text-ink-600">{nota.coverImageCredit}</figcaption>
+          )}
+        </figure>
       ) : null}
 
       <div className="prose prose-lg mt-8 max-w-none prose-headings:font-display prose-headings:text-brand-verde prose-blockquote:font-hand prose-blockquote:text-2xl prose-blockquote:not-italic prose-blockquote:text-brand-verde prose-blockquote:border-brand-amarillo">
@@ -153,6 +168,9 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
             ),
             Epigrafe,
             Pausa,
+            Incrustado: (props: { src: string; titulo: string; alto?: string }) => (
+              <Incrustado {...props} amplia={nota.especial} />
+            ),
             Galeria: () => <Galeria images={nota.images.slice(usadas)} />,
             VideosCortos: () => <VideosCortos nota={nota} />,
           }}

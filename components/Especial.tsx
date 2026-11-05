@@ -67,6 +67,43 @@ export function Epigrafe({
   );
 }
 
+/**
+ * A partner's interactive embed (e.g. Ciclos CAP's special), from the iframe
+ * code they send. Their `style="…"` can't go in MDX (it would be a JS
+ * object), so it's rebuilt here. `alto` in px; `titulo` is the iframe's
+ * accessible name. A plain link below in case the iframe doesn't load.
+ */
+export function Incrustado({
+  src,
+  titulo,
+  alto = "600",
+  amplia,
+}: {
+  src: string;
+  titulo: string;
+  alto?: string;
+  amplia?: boolean;
+}) {
+  return (
+    <div className={`not-prose my-10 ${amplia ? FOTO_AMPLIA : ""}`}>
+      <iframe
+        src={src}
+        title={titulo}
+        width="100%"
+        height={alto}
+        loading="lazy"
+        className="mx-auto block overflow-hidden rounded-xl border-0"
+      />
+      <a
+        href={src}
+        className="mt-2 inline-block text-sm text-ink-600 underline hover:text-brand-verde"
+      >
+        Abrir “{titulo}” en una página aparte
+      </a>
+    </div>
+  );
+}
+
 /** Section break (the Doc's `***`). */
 export function Pausa() {
   return <hr className="not-prose mx-auto my-14 h-1 w-20 rounded-full border-0 bg-brand-amarillo" />;

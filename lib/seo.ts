@@ -26,7 +26,9 @@ export function newsArticleJsonLd(nota: Nota) {
     dateModified: nota.updatedDate ?? nota.pubDate,
     author: isNewsroomByline(nota.author)
       ? { "@type": "Organization", name: SITE_NAME, url: SITE_URL }
-      : { "@type": "Person", name: nota.author },
+      : nota.autorOrganizacion
+        ? { "@type": "Organization", name: nota.author }
+        : { "@type": "Person", name: nota.author },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,

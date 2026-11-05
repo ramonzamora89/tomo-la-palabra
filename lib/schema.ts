@@ -19,6 +19,16 @@ export const notaSchema = z.object({
   tags: z.array(z.string()).default([]),
   coverImage: z.string(),
   coverImageAlt: z.string(),
+  // Credit shown under the cover on the note page ("Ilustración: …").
+  coverImageCredit: z.string().optional(),
+  // Show the cover whole on the note page instead of cropping it to 16:9
+  // (cards, Hero and OG still crop). Needs the cover's pixel size.
+  portadaCompleta: z.boolean().optional(),
+  coverImageWidth: z.number().optional(),
+  coverImageHeight: z.number().optional(),
+  // The byline is an organization (an allied outlet), not a person: JSON-LD
+  // author goes as Organization.
+  autorOrganizacion: z.boolean().optional(),
   // Every other photo inserted in the Doc, in document order — rendered by
   // <Galeria /> after the body. Includes the cover when the note has a
   // video, since the embed replaces the cover on the note page.
