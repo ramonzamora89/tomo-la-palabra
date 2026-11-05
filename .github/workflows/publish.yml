@@ -27,7 +27,24 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
+      # node_modules en caché: npm ci baja el binario de ffmpeg-static desde
+      # GitHub Releases, y un 504 de ahí tumbaba la corrida (5-nov-2026).
+      # Con caché solo se instala cuando cambia package-lock.json.
+      - name: Restore node_modules
+        id: cache-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: modules-${{ runner.os }}-node20-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (con reintentos)
+        if: steps.cache-modules.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3; do
+            npm ci && break
+            [ "$i" -eq 3 ] && exit 1
+            echo "npm ci falló (intento $i), reintentando en 30 s"; sleep 30
+          done
 
       - name: Configure git identity for the publish commit
         run: |

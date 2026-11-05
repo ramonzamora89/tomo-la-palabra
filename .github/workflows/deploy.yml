@@ -99,8 +99,16 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
+      # Reintentos: npm ci baja el binario de ffmpeg-static desde GitHub
+      # Releases, que a veces responde 504 (5-nov-2026).
+      - name: Install dependencies (con reintentos)
         if: steps.check.outputs.skip != 'true'
+        run: |
+          for i in 1 2 3; do
+            npm ci && break
+            [ "$i" -eq 3 ] && exit 1
+            echo "npm ci falló (intento $i), reintentando en 30 s"; sleep 30
+          done
 
       - name: Deploy to Vercel (production)
         if: steps.check.outputs.skip != 'true'
