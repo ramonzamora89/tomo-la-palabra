@@ -20,7 +20,7 @@ Tomo la Palabra es un medio guatemalteco, nacido en redes sociales, enfocado en 
 
 El sitio está en producción con dominio propio y 31 notas reales. El flujo editorial funciona solo, en GitHub Actions, con un reloj en Cloudflare que lo lanza a tiempo:
 
-- **Tres formas de empezar una nota**: subir una entrevista en video (el borrador se transcribe y redacta solo), o copiar una de las dos plantillas, **Nota general** o **Columna de opinión** (sección Voces). Desde ahí, mover el Doc a Publicar lo publica en unos 15 minutos.
+- **Tres formas de empezar una nota**: subir una entrevista en video (el borrador se transcribe y redacta solo), o copiar una de las dos plantillas, **Nota general** o **Columna de opinión** (sección Voces). Desde ahí, mover el Doc a Publicar lo publica en unos 30 minutos.
 - **Siete secciones** definidas por el equipo: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad y La Calle. Voces es la sección de opinión (columnas firmadas); hasta el 20-oct-2026 existía además una sección Opinión, que se fusionó con Voces.
 - **Desde el Doc** se controla la firma (`Autor`, por defecto "Redacción Tomo la Palabra"), la nota principal de la portada (`Destacada`), las fotos (todas se publican, repartidas en el texto) y los videos cortos de Instagram, TikTok o YouTube Shorts (`Videos cortos`).
 - **Corregir** una nota es editar su Doc en Archivo y volver a moverlo a Publicar. Conserva la fecha original; si cambió el titular, la URL vieja redirige a la nueva.
@@ -53,7 +53,7 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 
 ### 8 y 9 de octubre de 2026: el flujo, a tiempo
 
-- **Reloj en Cloudflare.** El cron de GitHub corría Publish "cada 15 minutos" cada 4 a 6 horas, así que una nota podía tardar medio día en salir. Un Worker de Cloudflare (`cron/`, mismo patrón que Escucha-Social) lo lanza ahora cada 15 minutos y Transcribe cada 30. Para hacerle lugar en el cupo gratuito de 5 crons se le quitó el suyo al reloj de otro proyecto (rastreo-carta), que ya no lo necesitaba.
+- **Reloj en Cloudflare.** El cron de GitHub corría Publish "cada 15 minutos" cada 4 a 6 horas, así que una nota podía tardar medio día en salir. Un Worker de Cloudflare (`cron/`, mismo patrón que Escucha-Social) lanzaba Publish cada 15 minutos y Transcribe cada 30; desde el 7-nov-2026 los dos van cada 30, para gastar menos minutos de Actions con el repo privado. Para hacerle lugar en el cupo gratuito de 5 crons se le quitó el suyo al reloj de otro proyecto (rastreo-carta), que ya no lo necesitaba.
 - **Sin corridas simultáneas** (`concurrency` en los tres workflows): evita procesar un video dos veces y pagar doble, o que un deploy viejo termine después de uno nuevo.
 - **Se quitó una nota duplicada**: "Nos ponen al final de la cola…" (agosto) era una versión de prueba de "Sin agua en la colonia Landívar…" (octubre), con la misma entrevista. Su URL redirige a la de octubre.
 - El equipo republicó buena parte de las notas desde Archivo, con fotos y titulares corregidos: el flujo de corrección ya está en uso.

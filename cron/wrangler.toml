@@ -6,10 +6,10 @@ workers_dev = false   # sin URL pública: solo corre por el cron
 [vars]
 GITHUB_REPO = "ramonzamora89/tomo-la-palabra"
 
-# Un solo cron (el plan gratuito tiene pocos por cuenta): cada 15 min.
-# src/index.js decide en cada tick qué workflows lanzar.
+# Un solo cron (el plan gratuito tiene pocos por cuenta): cada 30 min.
+# Lanza Publish y Transcribe en cada tick (src/index.js).
 [triggers]
-crons = ["4,19,34,49 * * * *"]
+crons = ["4,34 * * * *"]
 
 [observability]
 enabled = true

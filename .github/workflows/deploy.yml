@@ -6,13 +6,17 @@ name: Deploy
 on:
   push:
     branches: [main]
-  # Pushes made with the default GITHUB_TOKEN (e.g. from Publish) don't
-  # trigger `on: push` workflows — GitHub's own loop-prevention rule. Chain
-  # off Publish's completion instead so publishing a note still deploys.
-  workflow_run:
-    workflows: ["Publish"]
-    types: [completed]
+  # Publish lo lanza con workflow_dispatch (forzar=false) solo cuando empujó
+  # una nota o se cumplió un embargo. Antes Deploy escuchaba `workflow_run`
+  # de cada Publish, y en repo privado cada una de esas corridas vacías
+  # contaba como un minuto de Actions. Un push hecho con el GITHUB_TOKEN no
+  # dispara `on: push` (regla anti-loop de GitHub), pero workflow_dispatch sí.
   workflow_dispatch:
+    inputs:
+      forzar:
+        description: "Desplegar aunque el commit ya esté en producción (deploy manual)"
+        type: boolean
+        default: true
 
 # Deploys en fila: si dos corren a la vez, el de un commit más viejo puede
 # terminar último y dejarlo en producción.
@@ -22,73 +26,32 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      # After Publish, deploy the tip of its branch — NOT workflow_run.head_sha,
-      # which is the commit Publish *ran on*, i.e. the one before the note it
-      # just pushed. Using head_sha left every new note off the site until
-      # the next cron tick (15-30 min late).
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
-      # Publish runs on a 15-min cron and completes successfully even when
-      # there's nothing new to publish, which used to trigger a real
-      # `vercel deploy` every time via workflow_run below — burning through
-      # Vercel's free-tier upload quota (5000/day) with same-commit
-      # redeploys. Skip the deploy entirely when this commit is already
-      # live in production.
+      # No reconstruir un commit que ya está en producción (un push que no
+      # cambia nada, o un Publish que se cruzó con otro deploy). La lógica,
+      # embargos incluidos, vive en scripts/necesita-deploy.sh.
       - name: Check if this commit is already deployed
         id: check
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          # Un deploy pedido a mano (workflow_dispatch) siempre debe correr:
-          # es la única forma de recoger cambios que no viven en el commit,
-          # como variables de entorno nuevas en Vercel. Además, `vercel deploy
-          # --prebuilt` produce deployments que Vercel se niega a redesplegar
-          # desde su dashboard ("Prebuilt deployments cannot be redeployed"),
-          # así que sin esta salida no habría ninguna manera de forzarlo.
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # Un deploy pedido a mano siempre debe correr: es la única forma de
+          # recoger cambios que no viven en el commit, como variables de
+          # entorno nuevas en Vercel. Además, `vercel deploy --prebuilt`
+          # produce deployments que Vercel se niega a redesplegar desde su
+          # dashboard ("Prebuilt deployments cannot be redeployed").
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.forzar }}" != "false" ]; then
             echo "Deploy manual: se omite el chequeo de deduplicación."
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          SHA="$(git rev-parse HEAD)"
-          LATEST=$(curl -sf -H "Authorization: Bearer $VERCEL_TOKEN" \
-            "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=production&limit=1&state=READY" \
-            || echo "{}")
-          LATEST_SHA=$(echo "$LATEST" | jq -r '.deployments[0].meta.githubCommitSha // empty' || echo "")
-          # Cuándo empezó el build de ese deploy (ms), anotado por el paso de
-          # deploy; los deploys viejos no lo tienen.
-          LATEST_BUILD=$(echo "$LATEST" | jq -r '.deployments[0].meta.buildStartedAt // empty' || echo "")
-          echo "Commit a desplegar: $SHA"
-          echo "Último deploy en producción: ${LATEST_SHA:-<no se pudo determinar>}"
-
-          # Una nota con embargo (publishAt) ya viaja en el commit, pero el
-          # build la deja fuera de portada, secciones y sitemap hasta su hora.
-          # Si esa hora pasó después del último build, hay que reconstruir
-          # aunque el commit sea el mismo. El reloj de Cloudflare lanza
-          # Publish cada 15 min, y este workflow lo sigue.
-          NOW_MS=$(( $(date +%s) * 1000 ))
-          LIBERADA=""
-          for T in $(grep -h '^publishAt:' content/notas/*.mdx 2>/dev/null \
-                       | sed -E "s/^publishAt:[[:space:]]*['\"]?([^'\"]+)['\"]?[[:space:]]*$/\1/" || true); do
-            T_MS=$(( $(date -d "$T" +%s) * 1000 ))
-            if [ "$T_MS" -le "$NOW_MS" ] && [ "$T_MS" -gt "${LATEST_BUILD:-$NOW_MS}" ]; then
-              LIBERADA="$T"
-            fi
-          done
-          if [ -n "$LIBERADA" ]; then
-            echo "Se cumplió el embargo de una nota ($LIBERADA) después del último build: se despliega."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [ -n "$LATEST_SHA" ] && [ "$SHA" = "$LATEST_SHA" ]; then
-            echo "Ya está desplegado, se omite el build/deploy."
+          RESP=$(bash scripts/necesita-deploy.sh)
+          echo "$RESP"
+          if [ "$(echo "$RESP" | tail -1)" = "no" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"

@@ -3,13 +3,15 @@ name: Publish
 # Watches Publicar: a journalist dragging a reviewed Doc here IS the publish
 # trigger. Parses it, commits the note to the repo (which triggers Deploy),
 # moves the Doc to Archivo, and logs it in the Registro de Publicaciones.
+# Then launches Deploy, but only if there is something new to put live.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write   # para lanzar Deploy con workflow_dispatch
 
 # Una sola corrida a la vez: dos Publish simultáneos procesarían el mismo Doc
 # y chocarían al hacer push. Las que llegan mientras otra corre esperan.
@@ -66,3 +68,22 @@ jobs:
           DRIVE_LEDGER_SHEET_ID: ${{ secrets.DRIVE_LEDGER_SHEET_ID }}
           NEXT_PUBLIC_SITE_URL: https://tomolapalabra.com
         run: npm run pipeline:watch-publicar
+
+      # Deploy solo cuando hace falta: una nota nueva o republicada, o un
+      # embargo que se cumplió desde el último build. La mayoría de las
+      # corridas no publican nada, y lanzar Deploy igual costaba un minuto de
+      # Actions cada vez.
+      - name: Launch Deploy if needed
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RESP=$(bash scripts/necesita-deploy.sh)
+          echo "$RESP"
+          if [ "$(echo "$RESP" | tail -1)" = "si" ]; then
+            gh workflow run deploy.yml --ref main -f forzar=false
+            echo "Deploy lanzado."
+          else
+            echo "Nada nuevo: no se lanza Deploy."
+          fi

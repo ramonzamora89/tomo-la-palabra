@@ -23,10 +23,10 @@ async function dispatch(env, workflow) {
 
 export default {
   async scheduled(event, env) {
-    // Publish cada 15 min; Transcribe cada 30 (los ticks de :04 y :34).
-    const minute = new Date(event.scheduledTime).getUTCMinutes();
-    const workflows = ["publish.yml"];
-    if (minute % 30 === 4) workflows.push("transcribe.yml");
+    // Publish y Transcribe cada 30 min (ticks de :04 y :34). Hasta el
+    // 7-nov-2026 Publish iba cada 15; con el repo privado cada corrida cuenta
+    // contra los minutos de Actions.
+    const workflows = ["publish.yml", "transcribe.yml"];
     const results = await Promise.allSettled(workflows.map((w) => dispatch(env, w)));
     const failed = results.filter((r) => r.status === "rejected");
     if (failed.length) throw new Error(failed.map((r) => r.reason.message).join("; "));
