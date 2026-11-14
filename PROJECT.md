@@ -75,6 +75,17 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 - **Formato especial** (`especial: true`): fotos más anchas que el texto, epígrafes con las estrofas de salsa en itálica y verso por verso, con el reproductor de Spotify de cada canción debajo, y separadores entre secciones.
 - **Anuncios ocultos**: los espacios de AdSense se veían como cajas punteadas vacías en todo el sitio. Ahora no aparecen hasta que exista `NEXT_PUBLIC_ADSENSE_CLIENT_ID` en Vercel.
 
+### 13 de noviembre de 2026: ilustraciones de las primeras columnistas de Voces
+
+- **Base de postulantes**: el formulario de columnistas responde en la hoja [Respuestas de formulario 1](https://docs.google.com/spreadsheets/d/10E1h-QL32gxlyu-nGgCBiLyGnhskcxweos30YmOZAEs/edit) (nombre de firma, bio, nombre de la columna, frecuencia, día, foto). Al 13-nov había cuatro: Paola Escobar ("Territorio y Memoria", mensual, martes), Mafer Jiménez C. y Paola Jiménez C. (hermanas; comparten la columna "POTENCIA SOCIAL" y se turnan los jueves: cada una firma sola, cada 15 días, así que el espacio sale todas las semanas) y Saúl Interiano (quincenal, martes; no mandó foto y su nombre de columna dice "Más saben ustedes").
+- **Ilustraciones de perfil** de las tres que mandaron foto, generadas en Artlist (Nano Banana 2) a partir de sus fotos y con el estilo de `USO DE REDES/FONDO.png`: papel crema arrugado, brochazos con bordes rotos en verde `#104734` y amarillo `#F9C432`, y líneas a mano en verde oscuro. Son cuadradas, de 2048 px, sin texto. Están en Drive, en `Columnistas Voces` dentro de la carpeta raíz del proyecto ([carpeta](https://drive.google.com/drive/folders/1chSds7RpNZaFBPeMCmbvm1csgL8_M7_Q)); en local, en `columnistas-voces/`, que queda fuera del repo (`.gitignore`) porque el repo es público. A la de Paola Escobar se le corrigió el pelo, que salió casi rubio en la primera versión.
+- **Aprobadas** las tres ilustraciones el 14-nov.
+
+### 14 de noviembre de 2026: perfil de columnista y primera columna de Voces
+
+- **Registro de columnistas** (`content/columnistas.ts`): la firma del Doc basta para que la columna muestre el retrato en círculo junto al nombre, el nombre de la columna y la bio al final, sin repetirlos en cada entrega. Entraron Paola Escobar, Mafer Jiménez C. y Paola Jiménez C. Detalle en CLAUDE.md.
+- **Primera columna**: "Un año de Tomo la Palabra: informar también es resistir", de Paola Escobar, destacada en portada.
+
 ## Decisiones ya tomadas
 
 - Video embebido de YouTube, no autohospedado. Los videos cortos usan el reproductor oficial de cada red.
@@ -101,6 +112,8 @@ Los 10 milestones del plan original completos y verificados con contenido real. 
 - **Embargos desde el Doc**: hoy `publishAt` y las notas especiales solo se escriben a mano en el `.mdx`. Si el equipo lo va a usar seguido, agregar encabezados "Publicar a las" y fotos colocadas en el Doc a `parseDoc.ts` y a la plantilla.
 - **Confirmar con el autor** "Aldo Dupié Ochoa Mejíal" (¿Mejía?) en el obituario.
 - **Voces está vacía** desde el 20-oct hasta que se publique la primera columna. Conviene avisarle al equipo del cambio, y que el menú muestra una sección sin notas mientras tanto.
+- **Saúl Interiano** no está en `content/columnistas.ts`: necesita foto o ilustración. Se agrega con su retrato cuadrado al rostro y su portada 16:9 en `public/images/columnistas/<firma>/`.
+- **Pendiente de definir**: si cada columna tiene su propia página (`/columna/potencia-social`) además de Voces.
 
 - **Primera nota desde plantilla publicada por alguien del equipo.** Las copias de plantilla quedan a nombre de cada persona, no de la cuenta de Moncho. La service account debería poder moverlas igual (ya mueve Docs que no son suyos), pero no se probó con una cuenta del equipo.
 - **Doc de prueba de la nota de la zona 7** (creado el 31 de julio, "Nos ponen al final de la cola…"): sigue en Archivo. Si alguien lo mueve a Publicar, la nota reaparece. Mandarlo a la papelera o renombrarlo "PRUEBA – no publicar". Su fila en el Registro también sigue.

@@ -46,6 +46,7 @@ cd cron && npx wrangler@4 deploy     # publica el reloj de Cloudflare (conserva 
 | `pipeline/src/lib/renamedNota.ts` | Titular cambiado → borra la nota vieja y agrega redirect |
 | `pipeline/src/createTemplate.ts` | Crea las plantillas Nota general / Voces (columna de opinión) |
 | `content/taxonomy/categorias.ts` | Las siete secciones, con su descripción |
+| `content/columnistas.ts` | Columnistas de Voces: firma, columna, bio, retrato y portada (ver "Columnistas") |
 | `content/redirects.json` | Redirects 308 de notas renombradas (lo escribe el pipeline) |
 | `lib/schema.ts` | Contrato del frontmatter |
 | `lib/intercalarFotos.ts` | Reparte las fotos en el cuerpo al renderizar |
@@ -91,6 +92,15 @@ Estilo Título 1 o 2; se comparan sin tildes ni mayúsculas. Todo lo que está a
 ### Secciones
 
 `content/taxonomy/categorias.ts`, definidas por el equipo en octubre de 2026: Voces, Reflector, Coyuntura, Profundidad, La Conversa, Comunidad, La Calle. La descripción de cada una se muestra en su página y se le pasa a Claude para que elija. **Voces es la sección de opinión** (columnas firmadas, `desdeEntrevista: false`), así que queda fuera de sus opciones. Hasta el 20-oct-2026 había además una sección Opinión y Voces recibía entrevistas: se fusionaron, las 4 notas de entrevista que estaban en Voces pasaron a Comunidad, `/categoria/opinion` redirige a Voces y "Opinión" sigue aceptándose como alias en el Doc (`alias` en `categorias.ts`). `/categoria/reportaje` (sección retirada) redirige a Profundidad en `next.config.mjs`. El menú completo aparece desde `xl` (1280 px); por debajo, hamburguesa.
+
+### Columnistas
+
+`content/columnistas.ts` registra a cada columnista de Voces; `lib/columnistas.ts` lo busca por `author` sin tildes ni mayúsculas, así que basta con firmar igual en el Doc. Cada entrada lleva dos versiones de su ilustración aprobada, en `public/images/columnistas/<firma>/`:
+
+- `retrato.jpg` (cuadrado, recortado al rostro, 600 px): círculo junto a la firma en la página de la columna, que reemplaza a la portada grande. Debajo del nombre va el de la columna ("Territorio y Memoria"); sin `columna`, "Columna de opinión".
+- `portada.jpg` (16:9, 1920 px): portada, tarjetas y OG cuando el Doc no trae foto. `lib/notas.ts` la pone al leer la nota, así que no hace falta republicar. Si el Doc trae foto, esa manda.
+
+La bio del Doc ("Sobre el autor") manda sobre la del registro. Una firma que no está en el registro se publica como antes: sin círculo y con la portada grande. Solo datos públicos: el formulario de postulación trae correo, teléfono y lugar de residencia, que no entran (el repo es público). Las ilustraciones originales (2048 px, cuadradas) viven en Drive y en `columnistas-voces/`, fuera del repo. Las hermanas Jiménez se turnan "Potencia Social": cada una firma sola, así que llevan dos entradas con la misma `columna`.
 
 ### Imágenes: el bug de las fotos flotantes
 

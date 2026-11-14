@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getColumnista } from "@/lib/columnistas";
 import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { Metadata } from "next";
@@ -79,6 +80,11 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
   const videoJsonLd = videoObjectJsonLd(nota);
   // Voces is the opinion section: signed columns, not interviews.
   const esOpinion = nota.category === "voces";
+  const columnista = esOpinion ? getColumnista(nota.author) : undefined;
+  const autorBio = nota.authorBio ?? columnista?.bio;
+  // The registry spells the name the way the columnist signs it, whatever
+  // capitalization the Doc used.
+  const firma = columnista?.firma ?? nota.author;
   // The paper texture is the "no photo" placeholder — fine on a card, but
   // an empty textured box at the top of the note itself reads as a bug.
   const hasCover = nota.coverImage !== "/images/paper-texture.svg";
@@ -102,15 +108,31 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
       </h1>
       <p className="mt-3 text-lg text-ink-600">{nota.dek}</p>
       {esOpinion ? (
-        <p className="mt-5 border-l-4 border-brand-amarillo pl-3">
-          <span className="block font-hand text-2xl leading-tight text-brand-verde">
-            {nota.author}
-          </span>
-          <span className="text-sm uppercase tracking-wide text-ink-600">
-            Columna de opinión &middot;{" "}
-            <time dateTime={nota.pubDate}>{formatDate(nota.pubDate)}</time>
-          </span>
-        </p>
+        // Opinion byline: the columnist's portrait in a circle, name beside
+        // it (content/columnistas.ts). The bio goes at the end of the column.
+        <div className="mt-6 flex items-center gap-4 border-y border-brand-gris py-4">
+          {columnista && (
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-ink-200 md:h-20 md:w-20">
+              <Image
+                src={columnista.retrato}
+                alt={`Ilustración de ${firma}`}
+                fill
+                priority
+                className="object-cover"
+                sizes="80px"
+              />
+            </div>
+          )}
+          <p>
+            <span className="block font-hand text-2xl leading-tight text-brand-verde">
+              {firma}
+            </span>
+            <span className="text-sm uppercase tracking-wide text-ink-600">
+              {columnista?.columna ? <>{columnista.columna} &middot; </> : "Columna de opinión · "}
+              <time dateTime={nota.pubDate}>{formatDate(nota.pubDate)}</time>
+            </span>
+          </p>
+        </div>
       ) : (
         <p className="mt-4 text-sm uppercase tracking-wide text-ink-600">
           Por {nota.author} &middot; <time dateTime={nota.pubDate}>{formatDate(nota.pubDate)}</time>
@@ -128,7 +150,7 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
             allowFullScreen
           />
         </div>
-      ) : hasCover ? (
+      ) : hasCover && !columnista ? (
         <figure className={`mt-6 ${nota.especial ? FOTO_AMPLIA : ""}`}>
           {nota.portadaCompleta && nota.coverImageWidth && nota.coverImageHeight ? (
             <Image
@@ -179,10 +201,10 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
 
       {esOpinion && (
         <aside className="mt-10 border-t border-brand-gris pt-6">
-          {nota.authorBio && (
+          {autorBio && (
             <>
-              <h2 className="font-display text-xl text-brand-verde">Sobre {nota.author}</h2>
-              <p className="mt-2 text-ink-700">{nota.authorBio}</p>
+              <h2 className="font-display text-xl text-brand-verde">Sobre {firma}</h2>
+              <p className="mt-2 text-ink-700">{autorBio}</p>
             </>
           )}
           <p className="mt-4 text-sm italic text-ink-600">

@@ -54,3 +54,6 @@ client_secret_*.json
 
 # Cloudflare (cron/)
 .wrangler/
+
+# Ilustraciones de columnistas (personas postulantes, no publicar en el repo)
+/columnistas-voces/

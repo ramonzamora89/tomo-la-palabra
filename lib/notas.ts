@@ -2,13 +2,21 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { notaSchema, type Nota } from "./schema";
+import { getColumnista } from "./columnistas";
 
+const SIN_FOTO = "/images/paper-texture.svg";
 const NOTAS_DIR = path.join(process.cwd(), "content", "notas");
 
 function readNota(fileName: string): Nota {
   const raw = fs.readFileSync(path.join(NOTAS_DIR, fileName), "utf8");
   const { data, content } = matter(raw);
   const frontmatter = notaSchema.parse(data);
+  // A Voces column without a photo of its own takes its columnist's cover,
+  // so the homepage, cards and social previews never show the empty texture.
+  if (frontmatter.category === "voces" && frontmatter.coverImage === SIN_FOTO) {
+    const columnista = getColumnista(frontmatter.author);
+    if (columnista) frontmatter.coverImage = columnista.portada;
+  }
   return { ...frontmatter, content };
 }
 
