@@ -15,6 +15,7 @@ import { Epigrafe, FOTO_AMPLIA, FOTO_AMPLIA_SIZES, Incrustado, Pausa } from "@/c
 import { intercalarFotos } from "@/lib/intercalarFotos";
 import { citasEnEspanol } from "@/lib/citas";
 import { VideosCortos } from "@/components/VideosCortos";
+import { Grafica } from "@/components/graficas";
 import {
   absoluteUrl,
   breadcrumbJsonLd,
@@ -190,6 +191,7 @@ export default async function NotaPage({ params }: { params: Promise<{ slug: str
             ),
             Epigrafe,
             Pausa,
+            Grafica,
             Incrustado: (props: { src: string; titulo: string; alto?: string }) => (
               <Incrustado {...props} amplia={nota.especial} />
             ),
