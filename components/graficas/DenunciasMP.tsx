@@ -381,3 +381,289 @@ export function GraficaTresCasos() {
     </figure>
   );
 }
+
+/* ---------------------------------------------------------------------- */
+/* 3. The eight femicides with the same accused: days since the complaint */
+/* ---------------------------------------------------------------------- */
+
+const HECHOS = [
+  { lugar: "Asunción Mita, Jutiapa", femicidio: "2025-12-30", dias: 26 },
+  { lugar: "El Chal, Petén", femicidio: "2025-09-25", dias: 34 },
+  { lugar: "Puerto Barrios, Izabal", femicidio: "2024-12-06", dias: 64 },
+  { lugar: "Lugar sin información", femicidio: "2020-12-12", dias: 74 },
+  { lugar: "San Luis Jilotepeque, Jalapa", femicidio: "2025-12-30", dias: 76 },
+  { lugar: "Antigua Guatemala, Sacatepéquez", femicidio: "2024-08-30", dias: 270 },
+  { lugar: "Asunción Mita, Jutiapa", femicidio: "2023-08-22", dias: 665 },
+  { lugar: "Amatitlán, Guatemala", femicidio: "2018-05-25", dias: 1006 },
+];
+
+const FUENTE_SINDICADO =
+  "Fuente: Ministerio Público, tabla de femicidios con el mismo sindicado en la denuncia previa (17 de mayo de 2018 al 16 de mayo de 2026), entregada a Tomo la Palabra por solicitud de acceso a la información pública. En Amatitlán, la denuncia previa es de 2015.";
+
+const miles = (n: number) => n.toLocaleString("es-GT");
+
+export function GraficaOchoHechos() {
+  const [cont, ancho] = useAncho<HTMLDivElement>();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [tip, setTip] = useState<{ texto: string; x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (!svgRef.current || !ancho) return;
+    // Labels above each bar on a phone, beside it from 600 px.
+    const angosto = ancho < 600;
+    const izq = angosto ? 0 : 240;
+    const der = 84;
+    const fila = angosto ? 50 : 36;
+    const alto = HECHOS.length * fila + 26;
+    const x = d3.scaleLinear().domain([0, 1050]).range([izq + 6, ancho - der]);
+
+    const svg = d3.select(svgRef.current).attr("width", ancho).attr("height", alto);
+    svg.selectAll("*").remove();
+
+    const g = svg
+      .selectAll("g.hecho")
+      .data(HECHOS)
+      .join("g")
+      .attr("class", "hecho")
+      .attr("transform", (_, i) => `translate(0,${i * fila})`);
+
+    const cy = angosto ? 34 : 18;
+    g.append("text")
+      .attr("x", 0)
+      .attr("y", angosto ? 14 : cy)
+      .attr("dominant-baseline", "middle")
+      .attr("font-size", 14)
+      .attr("fill", INK_900)
+      .text((d) => (angosto ? `${d.lugar} · ${fecha(d.femicidio)}` : d.lugar));
+    g.append("line").attr("x1", x(0)).attr("x2", x(1050)).attr("y1", cy).attr("y2", cy).attr("stroke", INK_300);
+    g.append("rect")
+      .attr("x", x(0))
+      .attr("y", cy - 5)
+      .attr("width", (d) => Math.max(2, x(d.dias) - x(0)))
+      .attr("height", 10)
+      .attr("rx", 3)
+      .attr("fill", VERDE);
+    g.append("circle").attr("cx", x(0)).attr("cy", cy).attr("r", 5).attr("fill", "#fff").attr("stroke", INK_900).attr("stroke-width", 2);
+    g.append("circle").attr("cx", (d) => x(d.dias)).attr("cy", cy).attr("r", 6).attr("fill", INK_900).attr("stroke", "#fff").attr("stroke-width", 2);
+    g.append("text")
+      .attr("x", (d) => x(d.dias) + 12)
+      .attr("y", cy)
+      .attr("dominant-baseline", "middle")
+      .attr("font-size", 14)
+      .attr("font-weight", 700)
+      .attr("fill", INK_900)
+      .text((d) => `${miles(d.dias)} días`);
+    // Hit target: the whole row.
+    g.append("rect")
+      .attr("width", ancho)
+      .attr("height", fila)
+      .attr("fill", "transparent")
+      .on("pointerenter pointermove", (ev: PointerEvent, d) => {
+        const [px, py] = d3.pointer(ev, cont.current);
+        setTip({
+          texto: `${d.lugar}: femicidio el ${fecha(d.femicidio)}, ${miles(d.dias)} días después de la denuncia`,
+          x: px,
+          y: py,
+        });
+      })
+      .on("pointerleave", () => setTip(null));
+
+    const eje = svg
+      .append("g")
+      .attr("transform", `translate(0,${HECHOS.length * fila + 2})`)
+      .call(
+        d3
+          .axisBottom(x)
+          .tickValues(angosto ? [0, 500, 1000] : [0, 250, 500, 750, 1000])
+          .tickSize(5)
+          .tickFormat((d) => miles(+d)),
+      );
+    eje.select(".domain").attr("stroke", INK_500);
+    eje.selectAll(".tick line").attr("stroke", INK_500);
+    eje.selectAll(".tick text").attr("fill", INK_600).attr("font-size", 12).attr("font-family", "inherit");
+  }, [ancho, cont]);
+
+  return (
+    <figure className="not-prose my-12">
+      <figcaption>
+        <p className="font-display text-2xl leading-tight text-brand-verde">
+          Ocho femicidios después de una denuncia contra el mismo sindicado
+        </p>
+        <p className="mt-1 text-base text-ink-700">
+          Días entre la denuncia por violencia contra la mujer y el femicidio, en los ocho hechos en los que el
+          registro del MP señala a la misma persona en ambos expedientes. En cinco pasaron menos de tres meses.
+        </p>
+      </figcaption>
+
+      <div ref={cont} className="relative mt-4">
+        <svg ref={svgRef} aria-hidden="true" className="block" />
+        <p aria-hidden="true" className="text-right text-xs text-ink-600">
+          días desde la denuncia
+        </p>
+        {tip && <Tooltip {...tip} />}
+      </div>
+
+      <p className="mt-3 text-xs text-ink-600">{FUENTE_SINDICADO}</p>
+
+      <table className="sr-only">
+        <caption>Días entre la denuncia y el femicidio, por hecho</caption>
+        <thead>
+          <tr>
+            <th scope="col">Lugar del femicidio</th>
+            <th scope="col">Fecha del femicidio</th>
+            <th scope="col">Días desde la denuncia</th>
+          </tr>
+        </thead>
+        <tbody>
+          {HECHOS.map((h) => (
+            <tr key={h.lugar + h.femicidio}>
+              <th scope="row">{h.lugar}</th>
+              <td>{fecha(h.femicidio)}</td>
+              <td>{miles(h.dias)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  );
+}
+
+/* ------------------------------------------------------------- */
+/* 4. Femicides among the 502, by year of the crime (2026 = cut) */
+/* ------------------------------------------------------------- */
+
+const POR_ANIO: { anio: number; n: number; corte?: boolean }[] = [
+  { anio: 2018, n: 1 },
+  { anio: 2019, n: 3 },
+  { anio: 2020, n: 9 },
+  { anio: 2021, n: 6 },
+  { anio: 2022, n: 11 },
+  { anio: 2023, n: 28 },
+  { anio: 2024, n: 23 },
+  { anio: 2025, n: 31 },
+  { anio: 2026, n: 15, corte: true },
+];
+
+export function GraficaFemicidiosPorAnio() {
+  const [cont, ancho] = useAncho<HTMLDivElement>();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [tip, setTip] = useState<{ texto: string; x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (!svgRef.current || !ancho) return;
+    const alto = 260;
+    const abajo = 28;
+    const angosto = ancho < 480;
+    const x = d3
+      .scaleBand<number>()
+      .domain(POR_ANIO.map((d) => d.anio))
+      .range([0, ancho])
+      .paddingInner(0.3)
+      .paddingOuter(0.1);
+    const y = d3.scaleLinear().domain([0, 35]).range([alto - abajo, 24]);
+    const svg = d3.select(svgRef.current).attr("width", ancho).attr("height", alto);
+    svg.selectAll("*").remove();
+
+    // The 2026 column is a partial year: hatched instead of solid.
+    const patron = svg
+      .append("defs")
+      .append("pattern")
+      .attr("id", "corte-2026")
+      .attr("width", 6)
+      .attr("height", 6)
+      .attr("patternUnits", "userSpaceOnUse")
+      .attr("patternTransform", "rotate(45)");
+    patron.append("rect").attr("width", 6).attr("height", 6).attr("fill", "#fff");
+    patron.append("rect").attr("width", 3).attr("height", 6).attr("fill", VERDE);
+
+    const col = svg.selectAll("g.anio").data(POR_ANIO).join("g").attr("class", "anio");
+    // Rounded top, square base on the baseline.
+    col
+      .append("path")
+      .attr("d", (d) => {
+        const x0 = x(d.anio)!;
+        const w = x.bandwidth();
+        const y0 = y(d.n);
+        const b = y(0);
+        const r = Math.min(4, (b - y0) / 2, w / 2);
+        return `M${x0},${b}V${y0 + r}Q${x0},${y0} ${x0 + r},${y0}H${x0 + w - r}Q${x0 + w},${y0} ${x0 + w},${y0 + r}V${b}Z`;
+      })
+      .attr("fill", (d) => (d.corte ? "url(#corte-2026)" : VERDE))
+      .attr("stroke", (d) => (d.corte ? VERDE : "none"))
+      .attr("stroke-width", 1.5);
+    col
+      .append("text")
+      .attr("x", (d) => x(d.anio)! + x.bandwidth() / 2)
+      .attr("y", (d) => y(d.n) - 7)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 14)
+      .attr("font-weight", 700)
+      .attr("fill", INK_900)
+      .text((d) => d.n);
+    col
+      .append("text")
+      .attr("x", (d) => x(d.anio)! + x.bandwidth() / 2)
+      .attr("y", alto - 8)
+      .attr("text-anchor", "middle")
+      .attr("font-size", angosto ? 12 : 13)
+      .attr("fill", INK_600)
+      .text((d) => `${angosto ? `’${String(d.anio).slice(2)}` : d.anio}${d.corte ? "*" : ""}`);
+    svg.append("line").attr("x1", 0).attr("x2", ancho).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", INK_500);
+    col
+      .append("rect")
+      .attr("x", (d) => x(d.anio)! - (x.step() - x.bandwidth()) / 2)
+      .attr("width", x.step())
+      .attr("height", alto)
+      .attr("fill", "transparent")
+      .on("pointerenter pointermove", (ev: PointerEvent, d) => {
+        const [px, py] = d3.pointer(ev, cont.current);
+        setTip({
+          texto: `${d.anio}: ${d.n} ${d.n === 1 ? "femicidio" : "femicidios"}${d.corte ? " (hasta el corte de la base)" : ""}`,
+          x: px,
+          y: py,
+        });
+      })
+      .on("pointerleave", () => setTip(null));
+  }, [ancho, cont]);
+
+  return (
+    <figure className="not-prose my-12">
+      <figcaption>
+        <p className="font-display text-2xl leading-tight text-brand-verde">Los 127 femicidios, por año</p>
+        <p className="mt-1 text-base text-ink-700">
+          Femicidios de mujeres que antes habían denunciado violencia, según el año del delito.
+        </p>
+      </figcaption>
+
+      <div ref={cont} className="relative mt-4">
+        <svg ref={svgRef} aria-hidden="true" className="block" />
+        {tip && <Tooltip {...tip} />}
+      </div>
+
+      <p className="mt-3 text-sm text-ink-700">* 2026 corresponde al corte de la base.</p>
+      <p className="mt-2 text-xs text-ink-600">{FUENTE}</p>
+
+      <table className="sr-only">
+        <caption>Femicidios de mujeres que habían denunciado violencia, por año del delito</caption>
+        <thead>
+          <tr>
+            <th scope="col">Año</th>
+            <th scope="col">Femicidios</th>
+          </tr>
+        </thead>
+        <tbody>
+          {POR_ANIO.map((d) => (
+            <tr key={d.anio}>
+              <th scope="row">{d.corte ? `${d.anio} (corte de la base)` : d.anio}</th>
+              <td>{d.n}</td>
+            </tr>
+          ))}
+          <tr>
+            <th scope="row">Total</th>
+            <td>127</td>
+          </tr>
+        </tbody>
+      </table>
+    </figure>
+  );
+}

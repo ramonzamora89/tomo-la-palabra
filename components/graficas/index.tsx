@@ -1,4 +1,9 @@
-import { Grafica502, GraficaTresCasos } from "./DenunciasMP";
+import {
+  Grafica502,
+  GraficaFemicidiosPorAnio,
+  GraficaOchoHechos,
+  GraficaTresCasos,
+} from "./DenunciasMP";
 
 /**
  * Data charts placed by hand in a note's MDX: `<Grafica id="…" />`.
@@ -9,6 +14,8 @@ import { Grafica502, GraficaTresCasos } from "./DenunciasMP";
 const GRAFICAS: Record<string, () => React.ReactElement> = {
   "denuncias-mp-502": Grafica502,
   "denuncias-mp-tres-casos": GraficaTresCasos,
+  "denuncias-mp-ocho-hechos": GraficaOchoHechos,
+  "denuncias-mp-femicidios-por-anio": GraficaFemicidiosPorAnio,
 };
 
 export function Grafica({ id }: { id: string }) {
